@@ -272,11 +272,7 @@ async function seedServices() {
     const result = await pool.query("SELECT COUNT(*) as c FROM services");
     if (parseInt(result.rows[0].c) > 0) return;
     await pool.query("INSERT INTO services (name, slug, description, price, type, available) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT DO NOTHING",
-      ['Intimate Sweet Buffet', 'intimate-sweet-buffet', 'An intimate dessert buffet setup perfect for small gatherings of 10-20 guests. Includes an assortment of cakes, pastries, cookies, and selected beverages. Ideal for small birthday parties, bridal showers, and intimate celebrations.', 0, 'buffet', 1]);
-    await pool.query("INSERT INTO services (name, slug, description, price, type, available) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT DO NOTHING",
-      ['Fancy Sweet Buffet', 'fancy-sweet-buffet', 'A mid-range dessert buffet for 20-50 guests. Features a wider selection of premium cakes, artisan pastries, gourmet cookies, chocolate fountain, and a beverage bar. Perfect for weddings, corporate events, and milestone celebrations.', 0, 'buffet', 1]);
-    await pool.query("INSERT INTO services (name, slug, description, price, type, available) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT DO NOTHING",
-      ['Magnificent Sweet Buffet', 'magnificent-sweet-buffet', 'Our grand dessert buffet for 50+ guests. A lavish spread featuring multi-tiered celebration cakes, French patisserie selection, customized dessert stations, chocolate fondue, premium beverage bar, full setup, serving staff, and dedicated event coordination.', 0, 'buffet', 1]);
+      ['Sweet Buffet', 'sweet-buffet', 'All-you-can-enjoy dessert buffet with assorted cakes, pastries, cookies, and beverages. Perfect for parties, weddings, and corporate events. Includes setup and serving staff.', 0, 'buffet', 1]);
     await pool.query("INSERT INTO services (name, slug, description, price, type, available) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT DO NOTHING",
       ['Customized Cake', 'customized-cake', 'Fully customized cake designed to your vision. Choose flavors, fillings, frosting, size, and decorations. Upload your inspiration photo and we will bring it to life!', 0, 'custom-cake', 1]);
     return;
@@ -285,11 +281,7 @@ async function seedServices() {
   const count = d.exec("SELECT COUNT(*) as c FROM services");
   if (count.length > 0 && count[0].values[0][0] > 0) return;
   await run("INSERT INTO services (name, slug, description, price, type, available) VALUES (?, ?, ?, ?, ?, ?)",
-    ['Intimate Sweet Buffet', 'intimate-sweet-buffet', 'An intimate dessert buffet setup perfect for small gatherings of 10-20 guests. Includes an assortment of cakes, pastries, cookies, and selected beverages. Ideal for small birthday parties, bridal showers, and intimate celebrations.', 0, 'buffet', 1]);
-  await run("INSERT INTO services (name, slug, description, price, type, available) VALUES (?, ?, ?, ?, ?, ?)",
-    ['Fancy Sweet Buffet', 'fancy-sweet-buffet', 'A mid-range dessert buffet for 20-50 guests. Features a wider selection of premium cakes, artisan pastries, gourmet cookies, chocolate fountain, and a beverage bar. Perfect for weddings, corporate events, and milestone celebrations.', 0, 'buffet', 1]);
-  await run("INSERT INTO services (name, slug, description, price, type, available) VALUES (?, ?, ?, ?, ?, ?)",
-    ['Magnificent Sweet Buffet', 'magnificent-sweet-buffet', 'Our grand dessert buffet for 50+ guests. A lavish spread featuring multi-tiered celebration cakes, French patisserie selection, customized dessert stations, chocolate fondue, premium beverage bar, full setup, serving staff, and dedicated event coordination.', 0, 'buffet', 1]);
+    ['Sweet Buffet', 'sweet-buffet', 'All-you-can-enjoy dessert buffet with assorted cakes, pastries, cookies, and beverages. Perfect for parties, weddings, and corporate events. Includes setup and serving staff.', 0, 'buffet', 1]);
   await run("INSERT INTO services (name, slug, description, price, type, available) VALUES (?, ?, ?, ?, ?, ?)",
     ['Customized Cake', 'customized-cake', 'Fully customized cake designed to your vision. Choose flavors, fillings, frosting, size, and decorations. Upload your inspiration photo and we will bring it to life!', 0, 'custom-cake', 1]);
   saveSqlite();

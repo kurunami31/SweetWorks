@@ -111,11 +111,12 @@ module.exports = function(upload) {
   });
 
   router.post('/services', upload.single('inspo_image'), async (req, res) => {
-    const { service_id, customer_name, customer_email, customer_phone, details } = req.body;
+    const { service_id, customer_name, customer_email, customer_phone, details, buffet_tier } = req.body;
     const inspo_image = req.file ? req.file.filename : null;
+    const fullDetails = buffet_tier ? `Buffet Tier: ${buffet_tier}\n${details}` : details;
     await db.run(
       "INSERT INTO service_orders (service_id, customer_name, customer_email, customer_phone, details, inspo_image) VALUES (?, ?, ?, ?, ?, ?)",
-      [service_id, customer_name, customer_email, customer_phone, details, inspo_image]
+      [service_id, customer_name, customer_email, customer_phone, fullDetails, inspo_image]
     );
     res.redirect('/services?submitted=1');
   });

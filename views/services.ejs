@@ -10,29 +10,57 @@
     <% } %>
     <div class="services-grid">
       <% services.forEach(service => { %>
-        <div class="service-card" id="service-<%= service.id %>">
-          <div class="service-card-header">
-            <span class="service-type-badge <%= service.type %>">
-              <% if (service.type === 'buffet') { %>
-                <%= service.name.includes('Intimate') ? '🤝 Intimate' : service.name.includes('Fancy') ? '✨ Fancy' : service.name.includes('Magnificent') ? '👑 Magnificent' : 'Sweet Buffet' %>
-              <% } else { %>
-                🎨 Custom Cake
-              <% } %>
-            </span>
-            <h2><%= service.name %></h2>
-          </div>
-          <div class="service-card-body">
-            <p class="service-description"><%= service.description %></p>
-            <% if (service.type === 'buffet') { %>
+        <% if (service.type === 'buffet') { %>
+          <div class="service-card" id="service-<%= service.id %>">
+            <div class="service-card-header">
+              <span class="service-type-badge">🍰 Sweet Buffet</span>
+              <h2><%= service.name %></h2>
+              <p class="service-header-desc"><%= service.description %></p>
+            </div>
+            <div class="service-card-body">
               <p class="service-price">Quotation-based</p>
-            <% } else if (service.price > 0) { %>
-              <p class="service-price">Starting at ₱<%= service.price.toFixed(2) %></p>
-            <% } else { %>
-              <p class="service-price">Price depends on design</p>
-            <% } %>
-            <button class="btn btn-primary" onclick="showOrderForm(<%= service.id %>)">Order Now</button>
+              <div class="buffet-tiers">
+                <div class="buffet-tier" onclick="selectBuffetTier(this, 'intimate')">
+                  <span class="buffet-tier-icon">🤝</span>
+                  <div class="buffet-tier-info">
+                    <strong>Intimate</strong>
+                    <span>10–20 guests</span>
+                    <p>Assorted cakes, pastries, cookies & selected beverages</p>
+                  </div>
+                </div>
+                <div class="buffet-tier" onclick="selectBuffetTier(this, 'fancy')">
+                  <span class="buffet-tier-icon">✨</span>
+                  <div class="buffet-tier-info">
+                    <strong>Fancy</strong>
+                    <span>20–50 guests</span>
+                    <p>Premium cakes, artisan pastries, chocolate fountain & beverage bar</p>
+                  </div>
+                </div>
+                <div class="buffet-tier" onclick="selectBuffetTier(this, 'magnificent')">
+                  <span class="buffet-tier-icon">👑</span>
+                  <div class="buffet-tier-info">
+                    <strong>Magnificent</strong>
+                    <span>50+ guests</span>
+                    <p>Multi-tier cakes, French patisserie, dessert stations & event coordination</p>
+                  </div>
+                </div>
+              </div>
+              <button class="btn btn-primary" onclick="showOrderForm(<%= service.id %>)" style="width:100%;margin-top:1rem">Get a Quote</button>
+            </div>
           </div>
-        </div>
+        <% } else { %>
+          <div class="service-card" id="service-<%= service.id %>">
+            <div class="service-card-header">
+              <span class="service-type-badge">🎨 Custom Cake</span>
+              <h2><%= service.name %></h2>
+              <p class="service-header-desc"><%= service.description %></p>
+            </div>
+            <div class="service-card-body">
+              <p class="service-price">Price depends on design</p>
+              <button class="btn btn-primary" onclick="showOrderForm(<%= service.id %>)" style="width:100%">Order Now</button>
+            </div>
+          </div>
+        <% } %>
       <% }) %>
     </div>
   </div>
@@ -44,6 +72,33 @@
     <h2 id="modal-service-name" style="margin-bottom:1rem">Order Service</h2>
     <form method="POST" action="/services" enctype="multipart/form-data" id="service-order-form">
       <input type="hidden" name="service_id" id="form-service-id">
+      <input type="hidden" name="buffet_tier" id="form-buffet-tier" value="">
+      <div id="buffet-tier-selector" style="display:none;margin-bottom:1rem">
+        <label style="font-weight:600;display:block;margin-bottom:0.5rem">Select Buffet Tier</label>
+        <div class="tier-options">
+          <label class="tier-option" onclick="document.getElementById('form-buffet-tier').value='intimate'">
+            <input type="radio" name="buffet_tier_radio" value="intimate" onchange="document.getElementById('form-buffet-tier').value=this.value">
+            <span class="tier-option-content">
+              <strong>🤝 Intimate</strong>
+              <small>10–20 guests</small>
+            </span>
+          </label>
+          <label class="tier-option" onclick="document.getElementById('form-buffet-tier').value='fancy'">
+            <input type="radio" name="buffet_tier_radio" value="fancy" onchange="document.getElementById('form-buffet-tier').value=this.value">
+            <span class="tier-option-content">
+              <strong>✨ Fancy</strong>
+              <small>20–50 guests</small>
+            </span>
+          </label>
+          <label class="tier-option" onclick="document.getElementById('form-buffet-tier').value='magnificent'">
+            <input type="radio" name="buffet_tier_radio" value="magnificent" onchange="document.getElementById('form-buffet-tier').value=this.value">
+            <span class="tier-option-content">
+              <strong>👑 Magnificent</strong>
+              <small>50+ guests</small>
+            </span>
+          </label>
+        </div>
+      </div>
       <div id="quotation-notice" style="display:none;background:var(--accent-light);padding:0.75rem;border-radius:8px;margin-bottom:1rem;font-size:0.85rem;color:var(--primary-dark)">
         This service is quotation-based. The final price will be provided by our team after reviewing your requirements.
       </div>
@@ -79,7 +134,7 @@
 <style>
 .services-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
   gap: 1.5rem;
   margin-top: 1rem;
 }
@@ -103,6 +158,12 @@
   font-size: 1.3rem;
   margin: 0;
 }
+.service-header-desc {
+  font-size: 0.85rem;
+  opacity: 0.85;
+  margin-top: 0.5rem;
+  line-height: 1.5;
+}
 .service-type-badge {
   display: inline-block;
   padding: 0.2rem 0.6rem;
@@ -117,17 +178,91 @@
 .service-card-body {
   padding: 1.5rem;
 }
-.service-description {
-  color: var(--text-light);
-  font-size: 0.95rem;
-  line-height: 1.6;
-  margin-bottom: 1rem;
-}
 .service-price {
   font-size: 1.2rem;
   font-weight: 700;
   color: var(--primary);
   margin-bottom: 1rem;
+}
+.buffet-tiers {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.buffet-tier {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.buffet-tier:hover {
+  border-color: var(--primary);
+  background: var(--bg);
+}
+.buffet-tier.selected {
+  border-color: var(--primary);
+  background: var(--accent-light);
+}
+.buffet-tier-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+  margin-top: 0.1rem;
+}
+.buffet-tier-info strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--primary-dark);
+}
+.buffet-tier-info span {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--primary);
+  font-weight: 600;
+  margin-top: 0.1rem;
+}
+.buffet-tier-info p {
+  font-size: 0.82rem;
+  color: var(--text-light);
+  margin: 0.2rem 0 0;
+  line-height: 1.4;
+}
+.tier-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.tier-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.tier-option:has(input:checked) {
+  border-color: var(--primary);
+  background: var(--accent-light);
+}
+.tier-option input {
+  accent-color: var(--primary);
+}
+.tier-option-content {
+  display: flex;
+  flex-direction: column;
+}
+.tier-option-content strong {
+  font-size: 0.9rem;
+  color: var(--primary-dark);
+}
+.tier-option-content small {
+  font-size: 0.78rem;
+  color: var(--text-light);
 }
 @media (max-width: 768px) {
   .services-grid { grid-template-columns: 1fr; }
@@ -135,26 +270,28 @@
 </style>
 
 <script>
+let selectedBuffetTier = '';
+
+function selectBuffetTier(el, tier) {
+  document.querySelectorAll('.buffet-tier').forEach(t => t.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedBuffetTier = tier;
+}
+
 function showOrderForm(serviceId) {
-  const serviceCards = document.querySelectorAll('.service-card');
-  let serviceName = '';
-  let isBuffet = false;
-  serviceCards.forEach(card => {
-    if (card.id === 'service-' + serviceId) {
-      serviceName = card.querySelector('h2').textContent;
-      isBuffet = card.querySelector('.service-type-badge').classList.contains('buffet');
-    }
-  });
+  const isBuffet = document.querySelector('#service-' + serviceId + ' .service-type-badge').textContent.includes('Sweet Buffet');
   document.getElementById('form-service-id').value = serviceId;
-  document.getElementById('modal-service-name').textContent = 'Order: ' + serviceName;
+  document.getElementById('buffet-tier-selector').style.display = isBuffet ? 'block' : 'none';
   document.getElementById('quotation-notice').style.display = isBuffet ? 'block' : 'none';
-  const inspoUpload = document.getElementById('inspo-upload');
-  inspoUpload.style.display = serviceId === 2 ? 'block' : 'none';
+  document.getElementById('inspo-upload').style.display = isBuffet ? 'none' : 'block';
+  document.getElementById('modal-service-name').textContent = isBuffet ? 'Order: Sweet Buffet' : 'Order: Customized Cake';
   document.getElementById('service-order-modal').classList.remove('hidden');
 }
+
 function closeOrderForm() {
   document.getElementById('service-order-modal').classList.add('hidden');
 }
+
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') closeOrderForm();
 });

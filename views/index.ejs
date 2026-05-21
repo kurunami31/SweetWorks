@@ -49,13 +49,7 @@
     <div class="services-preview">
       <% services.forEach((svc, i) => { %>
         <div class="service-preview-card" style="animation-delay: <%= 0.1 + i * 0.12 %>s">
-          <div class="service-preview-icon">
-            <% if (svc.type === 'buffet') { %>
-              <%= svc.name.includes('Intimate') ? '🤝' : svc.name.includes('Fancy') ? '✨' : svc.name.includes('Magnificent') ? '👑' : '🍰' %>
-            <% } else { %>
-              🎨
-            <% } %>
-          </div>
+          <div class="service-preview-icon"><%= svc.type === 'buffet' ? '🍰' : '🎨' %></div>
           <h3><%= svc.name %></h3>
           <p><%= svc.description %></p>
           <div class="service-preview-footer">
