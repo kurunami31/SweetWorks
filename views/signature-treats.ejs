@@ -1,0 +1,30 @@
+<%- include('partials/header') %>
+<section class="section section-featured">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">Featured</span>
+      <h2 class="section-title">Signature Treats</h2>
+      <p class="section-desc">Our most beloved creations, baked fresh daily</p>
+    </div>
+    <div class="signatures-list">
+      <% featured.forEach((product, i) => { %>
+        <div class="signature-item" style="animation-delay: <%= 0.1 + i * 0.15 %>s">
+          <div class="signature-number"><%= String(i + 1).padStart(2, '0') %></div>
+          <div class="signature-content">
+            <span class="signature-category"><%= product.category_name || 'Bakery' %></span>
+            <h3 class="signature-name"><%= product.name %></h3>
+            <p class="signature-desc"><%= product.description %></p>
+            <div class="signature-footer">
+              <span class="signature-price">₱<%= product.price.toFixed(2) %></span>
+              <span class="signature-badge">Best Seller</span>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+    <div class="text-center" style="margin-top:3rem">
+      <a href="/menu" class="btn btn-primary">View Full Menu &rarr;</a>
+    </div>
+  </div>
+</section>
+<%- include('partials/footer') %>
