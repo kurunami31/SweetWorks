@@ -16,7 +16,8 @@
   </div>
 </section>
 
-<section class="section fade-in">
+<section class="section section-featured fade-in">
+  <div class="section-featured-divider top"></div>
   <div class="container">
     <div class="section-header">
       <span class="section-tag">Featured</span>
@@ -25,7 +26,8 @@
     </div>
     <div class="product-grid staggered">
       <% featured.forEach((product, i) => { %>
-        <div class="product-card" style="animation-delay: <%= 0.1 + i * 0.1 %>s">
+        <div class="product-card featured-card" style="animation-delay: <%= 0.1 + i * 0.1 %>s">
+          <div class="featured-badge">Best Seller</div>
           <div class="product-card-body">
             <span class="product-category"><%= product.category_name || 'Bakery' %></span>
             <h3><%= product.name %></h3>
@@ -39,6 +41,7 @@
       <a href="/menu" class="btn btn-primary">View Full Menu &rarr;</a>
     </div>
   </div>
+  <div class="section-featured-divider bottom"></div>
 </section>
 
 <section class="section section-alt fade-in">
@@ -201,6 +204,19 @@
 }
 
 /* Section styling */
+.section-featured {
+  position: relative;
+  padding: 4rem 0;
+}
+.section-featured-divider {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), var(--primary), var(--accent), transparent);
+}
+.section-featured-divider.top { top: 0; }
+.section-featured-divider.bottom { bottom: 0; }
 .section-alt {
   background: var(--bg-alt);
 }
@@ -233,6 +249,24 @@
 }
 
 /* Product cards refined */
+.featured-card {
+  position: relative;
+  border: 2px solid var(--accent);
+  box-shadow: 0 4px 20px rgba(61,90,69,0.1);
+}
+.featured-badge {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--white);
+  background: var(--primary);
+}
 .product-category {
   display: inline-block;
   font-size: 0.7rem;
