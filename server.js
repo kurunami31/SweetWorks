@@ -1,16 +1,29 @@
 const express = require('express');
+const session = require('express-session');
 const path = require('path');
-const { initDb, seedData } = require('./database');
+const { initDb, seedData, seedAdmin } = require('./database');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(session({
+  secret: 'sweetworks-secret-key-change-in-production',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { maxAge: 24 * 60 * 60 * 1000 }
+}));
+
 app.use((req, res, next) => {
+  res.locals.user = req.session.userId ? {
+    id: req.session.userId,
+    username: req.session.username,
+    role: req.session.role
+  } : null;
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -21,9 +34,12 @@ app.use((req, res, next) => {
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+const { router: authRouter, isAuthenticated } = require('./routes/auth');
+
 app.use('/', require('./routes/public'));
-app.use('/admin', require('./routes/admin'));
-app.use('/pos', require('./routes/pos'));
+app.use('/', authRouter);
+app.use('/admin', isAuthenticated, require('./routes/admin'));
+app.use('/pos', isAuthenticated, require('./routes/pos'));
 
 app.use((req, res) => {
   res.status(404).render('error', { message: 'Page not found' });
@@ -32,6 +48,7 @@ app.use((req, res) => {
 async function start() {
   await initDb();
   await seedData();
+  await seedAdmin();
   app.listen(PORT, () => {
     console.log(`SweetWorks Pastry Shop running at http://localhost:${PORT}`);
     console.log(`  Public site:  http://localhost:${PORT}`);

@@ -138,6 +138,16 @@ async function initDb() {
         price NUMERIC(10,2) NOT NULL
       )
     `);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        username TEXT NOT NULL UNIQUE,
+        email TEXT NOT NULL UNIQUE,
+        password TEXT NOT NULL,
+        role TEXT NOT NULL DEFAULT 'admin',
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
     return;
   }
 
@@ -147,6 +157,7 @@ async function initDb() {
   d.run("CREATE TABLE IF NOT EXISTS customers (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT, phone TEXT, address TEXT, notes TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)");
   d.run("CREATE TABLE IF NOT EXISTS orders (id INTEGER PRIMARY KEY AUTOINCREMENT, customer_id INTEGER, order_type TEXT NOT NULL DEFAULT 'online', status TEXT NOT NULL DEFAULT 'pending', total REAL NOT NULL DEFAULT 0, notes TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (customer_id) REFERENCES customers(id))");
   d.run("CREATE TABLE IF NOT EXISTS order_items (id INTEGER PRIMARY KEY AUTOINCREMENT, order_id INTEGER NOT NULL, product_id INTEGER NOT NULL, quantity INTEGER NOT NULL DEFAULT 1, price REAL NOT NULL, FOREIGN KEY (order_id) REFERENCES orders(id), FOREIGN KEY (product_id) REFERENCES products(id))");
+  d.run("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT NOT NULL UNIQUE, email TEXT NOT NULL UNIQUE, password TEXT NOT NULL, role TEXT NOT NULL DEFAULT 'admin', created_at DATETIME DEFAULT CURRENT_TIMESTAMP)");
   saveSqlite();
 }
 
@@ -228,4 +239,23 @@ async function seedData() {
   saveSqlite();
 }
 
-module.exports = { initDb, seedData, query, run, getDb };
+async function seedAdmin() {
+  const bcrypt = require('bcryptjs');
+  if (usePg) {
+    const pool = await getPgPool();
+    const existing = await pool.query("SELECT COUNT(*) as c FROM users");
+    if (parseInt(existing.rows[0].c) > 0) return;
+    const hash = await bcrypt.hash('admin123', 10);
+    await pool.query("INSERT INTO users (username, email, password, role) VALUES ($1,$2,$3,$4) ON CONFLICT DO NOTHING",
+      ['admin', 'admin@sweetworks.com', hash, 'admin']);
+    return;
+  }
+  const d = await getSqlite();
+  const existing = d.exec("SELECT COUNT(*) as c FROM users");
+  if (existing.length > 0 && existing[0].values[0][0] > 0) return;
+  const hash = await bcrypt.hash('admin123', 10);
+  await run("INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)",
+    ['admin', 'admin@sweetworks.com', hash, 'admin']);
+}
+
+module.exports = { initDb, seedData, seedAdmin, query, run, getDb };

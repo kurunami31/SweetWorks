@@ -21,8 +21,13 @@
         <li><a href="/">Home</a></li>
         <li><a href="/menu">Menu</a></li>
         <li><a href="/order">Order Online</a></li>
-        <li><a href="/admin">Admin</a></li>
-        <li><a href="/pos">POS</a></li>
+        <% if (user) { %>
+          <li><a href="/admin">Admin</a></li>
+          <li><a href="/pos">POS</a></li>
+          <li><a href="/logout" style="color:var(--danger)">Logout</a></li>
+        <% } else { %>
+          <li><a href="/login">Login</a></li>
+        <% } %>
       </ul>
     </div>
   </nav>

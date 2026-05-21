@@ -1,0 +1,43 @@
+<%- include('../partials/header') %>
+<section class="section">
+  <div class="container" style="max-width:400px">
+    <h1 class="section-title">Register Admin</h1>
+    <% if (hasAdmin) { %>
+      <div class="form-card text-center">
+        <p style="color:var(--text-light);margin-bottom:1rem">An admin account already exists. Only one admin is allowed.</p>
+        <a href="/login" class="btn btn-primary">Go to Login</a>
+      </div>
+    <% } else { %>
+      <form method="POST" class="form-card">
+        <% if (error) { %><div class="alert alert-error"><%= error %></div><% } %>
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" name="username" required autofocus>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" name="email" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" name="password" required>
+        </div>
+        <div class="form-group">
+          <label>Confirm Password</label>
+          <input type="password" name="confirmPassword" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%">Create Admin Account</button>
+      </form>
+      <p class="text-center" style="margin-top:1rem;font-size:0.9rem;color:var(--text-light)">
+        Already have an account? <a href="/login">Login here</a>
+      </p>
+    <% } %>
+  </div>
+</section>
+<style>
+  .alert-error {
+    background: #F8D7DA; color: #721C24; padding: 0.75rem 1rem;
+    border-radius: 8px; margin-bottom: 1rem; font-size: 0.9rem;
+  }
+</style>
+<%- include('../partials/footer') %>

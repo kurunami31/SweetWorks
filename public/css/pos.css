@@ -464,3 +464,46 @@ body {
   background: var(--border);
   border-radius: 3px;
 }
+
+/* POS Responsive */
+@media (max-width: 768px) {
+  body { overflow: auto; height: auto; }
+  .pos-container { height: auto; min-height: 100vh; }
+
+  .pos-header { padding: 0.5rem 0.75rem; flex-wrap: wrap; gap: 0.5rem; }
+  .pos-header-left h1 { font-size: 1rem; }
+
+  .pos-layout {
+    grid-template-columns: 1fr;
+    overflow: visible;
+  }
+
+  .pos-cart {
+    border-left: none;
+    border-top: 2px solid var(--border);
+    max-height: 50vh;
+  }
+
+  .pos-product-grid {
+    grid-template-columns: repeat(2, 1fr);
+    padding-right: 0;
+  }
+
+  .pos-product-btn { padding: 0.75rem 0.5rem; }
+  .pos-product-btn strong { font-size: 0.8rem; }
+  .pos-product-btn span { font-size: 1rem; }
+
+  .pos-categories { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .pos-categories::-webkit-scrollbar { display: none; }
+  .pos-cat-btn { white-space: nowrap; flex-shrink: 0; font-size: 0.8rem; padding: 0.35rem 0.8rem; }
+
+  .pos-actions { flex-direction: column; }
+  .pos-cart-items { padding: 0.5rem; }
+
+  .modal-content { padding: 1.25rem; margin: 0.5rem; width: 95%; }
+  .modal-actions { flex-direction: column; }
+  .modal-actions .pos-btn { width: 100%; }
+
+  .pos-total { font-size: 1.1rem; }
+  .pos-btn { font-size: 0.85rem; padding: 0.6rem; }
+}
