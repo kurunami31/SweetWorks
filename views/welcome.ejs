@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SweetWorks Pastry Shop</title>
+  <link rel="icon" type="image/x-icon" href="/images/SweetWorks(logo).ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --primary: #3D5A45;
+      --primary-dark: #2A4030;
+      --accent: #8BA18E;
+      --accent-light: #D4DDD0;
+      --white: #FFFFFF;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #1A2E1E 0%, #2A4030 30%, #3D5A45 60%, #4A6B53 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 80%, rgba(212,221,208,0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.05) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    /* Floating particles */
+    .particle {
+      position: fixed;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+      pointer-events: none;
+      animation: float linear infinite;
+    }
+    .particle:nth-child(1) { width: 80px; height: 80px; top: 10%; left: 5%; animation-duration: 25s; }
+    .particle:nth-child(2) { width: 120px; height: 120px; top: 60%; right: 10%; animation-duration: 30s; animation-delay: -5s; }
+    .particle:nth-child(3) { width: 60px; height: 60px; bottom: 20%; left: 40%; animation-duration: 20s; animation-delay: -10s; }
+    .particle:nth-child(4) { width: 100px; height: 100px; top: 30%; right: 30%; animation-duration: 28s; animation-delay: -8s; }
+    .particle:nth-child(5) { width: 50px; height: 50px; bottom: 10%; right: 25%; animation-duration: 22s; animation-delay: -3s; }
+
+    @keyframes float {
+      0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+    }
+
+    .welcome-container {
+      text-align: center;
+      z-index: 1;
+      padding: 2rem;
+    }
+
+    .welcome-logo {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 2rem;
+      border: 3px solid rgba(255,255,255,0.2);
+      animation: logoReveal 1.2s ease-out 0.2s both;
+    }
+    @keyframes logoReveal {
+      0% { opacity: 0; transform: scale(0.5) rotate(-10deg); }
+      60% { transform: scale(1.05) rotate(2deg); }
+      100% { opacity: 1; transform: scale(1) rotate(0deg); }
+    }
+
+    .welcome-title {
+      font-family: 'Dancing Script', cursive;
+      font-size: 5rem;
+      color: var(--white);
+      line-height: 1.1;
+      margin-bottom: 0.75rem;
+      text-shadow: 0 4px 30px rgba(0,0,0,0.2);
+      opacity: 0;
+      animation: fadeUp 0.8s ease-out 0.5s forwards;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .welcome-subtitle {
+      font-size: 1.1rem;
+      color: rgba(255,255,255,0.7);
+      font-weight: 300;
+      letter-spacing: 0.5px;
+      margin-bottom: 3rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease-out 0.7s forwards;
+    }
+
+    .welcome-divider {
+      width: 60px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent-light), transparent);
+      margin: 0 auto 2.5rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease-out 0.85s forwards;
+    }
+
+    .welcome-enter {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 2.5rem;
+      background: var(--white);
+      color: var(--primary-dark);
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      opacity: 0;
+      animation: fadeUp 0.8s ease-out 1s forwards;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+    .welcome-enter:hover {
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+      background: var(--accent-light);
+    }
+    .welcome-enter:active {
+      transform: translateY(0) scale(0.98);
+    }
+    .welcome-enter svg {
+      width: 20px;
+      height: 20px;
+      transition: transform 0.3s ease;
+    }
+    .welcome-enter:hover svg {
+      transform: translateX(4px);
+    }
+
+    .welcome-footer {
+      margin-top: 4rem;
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      opacity: 0;
+      animation: fadeUp 0.8s ease-out 1.2s forwards;
+    }
+
+    @media (max-width: 768px) {
+      .welcome-title { font-size: 3.2rem; }
+      .welcome-logo { width: 80px; height: 80px; }
+      .welcome-subtitle { font-size: 0.95rem; padding: 0 1rem; }
+      .welcome-enter { padding: 0.85rem 2rem; font-size: 0.9rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+
+  <div class="welcome-container">
+    <img src="/images/SweetWorks(logo).jpg" alt="SweetWorks" class="welcome-logo">
+    <h1 class="welcome-title">SweetWorks</h1>
+    <p class="welcome-subtitle">Artisan pastries, custom cakes & dessert services</p>
+    <div class="welcome-divider"></div>
+    <a href="/home" class="welcome-enter">
+      Enter the Bakery
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+        <polyline points="12 5 19 12 12 19"></polyline>
+      </svg>
+    </a>
+    <p class="welcome-footer">Est. 2026 &mdash; Manila, Philippines</p>
+  </div>
+</body>
+</html>

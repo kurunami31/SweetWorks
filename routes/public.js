@@ -4,7 +4,11 @@ const db = require('../database');
 module.exports = function(upload) {
   const router = express.Router();
 
-  router.get('/', async (req, res) => {
+  router.get('/', (req, res) => {
+    res.render('welcome');
+  });
+
+  router.get('/home', async (req, res) => {
     const featured = await db.query("SELECT p.*, c.name as category_name FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.featured = 1 AND p.available = 1");
     const categories = await db.query("SELECT * FROM categories");
     const services = await db.query("SELECT * FROM services WHERE available = 1 ORDER BY name");
