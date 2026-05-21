@@ -274,6 +274,7 @@
       </div>`;
       el.innerHTML = html;
       document.getElementById('pos-receipt-modal').classList.remove('hidden');
+      setTimeout(() => printReceipt(), 300);
     }
 
     function closeReceipt() {
