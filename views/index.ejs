@@ -53,7 +53,9 @@
           <h3><%= svc.name %></h3>
           <p><%= svc.description %></p>
           <div class="service-preview-footer">
-            <% if (svc.price > 0) { %>
+            <% if (svc.type === 'buffet') { %>
+              <span class="service-preview-price">Quotation</span>
+            <% } else if (svc.price > 0) { %>
               <span class="service-preview-price">₱<%= svc.price.toFixed(2) %></span>
             <% } else { %>
               <span class="service-preview-price">Custom Quote</span>

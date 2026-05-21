@@ -17,7 +17,9 @@
           </div>
           <div class="service-card-body">
             <p class="service-description"><%= service.description %></p>
-            <% if (service.price > 0) { %>
+            <% if (service.type === 'buffet') { %>
+              <p class="service-price">Quotation-based</p>
+            <% } else if (service.price > 0) { %>
               <p class="service-price">Starting at ₱<%= service.price.toFixed(2) %></p>
             <% } else { %>
               <p class="service-price">Price depends on design</p>
@@ -33,9 +35,12 @@
 <div id="service-order-modal" class="modal hidden">
   <div class="modal-content">
     <button class="modal-close" onclick="closeOrderForm()">&times;</button>
-    <h2 id="modal-service-name">Order Service</h2>
+    <h2 id="modal-service-name" style="margin-bottom:1rem">Order Service</h2>
     <form method="POST" action="/services" enctype="multipart/form-data" id="service-order-form">
       <input type="hidden" name="service_id" id="form-service-id">
+      <div id="quotation-notice" style="display:none;background:var(--accent-light);padding:0.75rem;border-radius:8px;margin-bottom:1rem;font-size:0.85rem;color:var(--primary-dark)">
+        This service is quotation-based. The final price will be provided by our team after reviewing your requirements.
+      </div>
       <div class="form-group">
         <label>Your Name *</label>
         <input type="text" name="customer_name" required>
@@ -127,13 +132,16 @@
 function showOrderForm(serviceId) {
   const serviceCards = document.querySelectorAll('.service-card');
   let serviceName = '';
+  let serviceType = '';
   serviceCards.forEach(card => {
     if (card.id === 'service-' + serviceId) {
       serviceName = card.querySelector('h2').textContent;
+      serviceType = card.querySelector('.service-type-badge').textContent.trim();
     }
   });
   document.getElementById('form-service-id').value = serviceId;
   document.getElementById('modal-service-name').textContent = 'Order: ' + serviceName;
+  document.getElementById('quotation-notice').style.display = serviceType === 'Sweet Buffet' ? 'block' : 'none';
   const inspoUpload = document.getElementById('inspo-upload');
   inspoUpload.style.display = serviceId === 2 ? 'block' : 'none';
   document.getElementById('service-order-modal').classList.remove('hidden');

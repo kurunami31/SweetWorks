@@ -69,9 +69,29 @@
             <label>Delivery Address</label>
             <textarea name="address" rows="2"></textarea>
           </div>
+          <div id="delivery-fields">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Delivery Date</label>
+                <input type="date" name="delivery_date">
+              </div>
+              <div class="form-group">
+                <label>Delivery Time</label>
+                <input type="time" name="delivery_time">
+              </div>
+            </div>
+            <p style="font-size:0.8rem;color:var(--danger);margin-bottom:1rem;padding:0.5rem;background:#FEF0F0;border-radius:6px">
+              <strong>Note:</strong> Transportation/Delivery Fee is not included in the prices of products/services availed.
+            </p>
+          </div>
+          <div class="form-group" id="pickup-time-group">
+            <label>Pickup Time</label>
+            <input type="time" name="pickup_time">
+            <p style="font-size:0.8rem;color:var(--text-light);margin-top:0.25rem">Tell us what time you will pick up your order</p>
+          </div>
           <div class="form-group">
             <label>Notes</label>
-            <textarea name="notes" rows="2"></textarea>
+            <textarea name="notes" rows="2" placeholder="Any special requests or instructions"></textarea>
           </div>
           <input type="hidden" name="items" id="cart-data">
           <button type="submit" class="btn btn-primary" id="submit-order" disabled>Place Order</button>
@@ -150,6 +170,8 @@
   function toggleDelivery() {
     const isDelivery = document.querySelector('input[name="order_type"]:checked').value === 'delivery';
     document.getElementById('address-group').style.display = isDelivery ? 'block' : 'none';
+    document.getElementById('delivery-fields').style.display = isDelivery ? 'block' : 'none';
+    document.getElementById('pickup-time-group').style.display = isDelivery ? 'none' : 'block';
   }
   toggleDelivery();
 </script>

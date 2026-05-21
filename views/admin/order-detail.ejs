@@ -13,10 +13,15 @@
       </div>
       <div class="form-card">
         <h3>Order Info</h3>
-        <p><strong>Type:</strong> <%= order.order_type %></p>
+        <p><strong>Type:</strong> <%= order.order_type === 'delivery' ? '🚚 Delivery' : '🏪 Pick Up' %></p>
         <p><strong>Status:</strong> <span class="status-badge <%= order.status %>"><%= order.status %></span></p>
         <p><strong>Date:</strong> <%= new Date(order.created_at).toLocaleString() %></p>
-        <p><strong>Notes:</strong> <%= order.notes || '-' %></p>
+        <% if (order.notes) { %>
+          <p><strong>Schedule/Notes:</strong> <%= order.notes.replace(/\|/g, '<br>') %></p>
+        <% } %>
+        <% if (order.order_type === 'delivery') { %>
+          <p style="color:var(--danger);font-size:0.85rem;margin-top:0.5rem">Transportation/Delivery Fee not included.</p>
+        <% } %>
         <form method="POST" action="/admin/orders/<%= order.id %>/status" style="margin-top:1rem">
           <label>Update Status:</label>
           <select name="status">

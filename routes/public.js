@@ -45,7 +45,7 @@ module.exports = function(upload) {
   });
 
   router.post('/order', async (req, res) => {
-    const { name, email, phone, address, items, notes, order_type } = req.body;
+    const { name, email, phone, address, items, notes, order_type, delivery_date, delivery_time, pickup_time } = req.body;
     if (!items || items.length === 0) {
       return res.redirect('/order?error=empty');
     }
@@ -68,8 +68,18 @@ module.exports = function(upload) {
       }
     }
 
+    let fullNotes = notes || '';
+    if (order_type === 'delivery') {
+      const dateNote = delivery_date ? `Delivery Date: ${delivery_date}` : '';
+      const timeNote = delivery_time ? `Delivery Time: ${delivery_time}` : '';
+      const extra = [dateNote, timeNote].filter(Boolean).join(' | ');
+      if (extra) fullNotes = fullNotes ? `${extra} | ${fullNotes}` : extra;
+    } else {
+      if (pickup_time) fullNotes = fullNotes ? `Pickup Time: ${pickup_time} | ${fullNotes}` : `Pickup Time: ${pickup_time}`;
+    }
+
     const orderId = await db.run("INSERT INTO orders (customer_id, order_type, status, total, notes) VALUES (?, ?, 'pending', ?, ?)",
-      [customerId, order_type || 'pickup', total, notes || '']);
+      [customerId, order_type || 'pickup', total, fullNotes]);
 
     for (const item of parsedItems) {
       const product = await db.query("SELECT price FROM products WHERE id = ?", [item.product_id]);
