@@ -1,8 +1,26 @@
 document.addEventListener('DOMContentLoaded', function() {
   const toggle = document.querySelector('.nav-toggle');
-  if (toggle) {
-    toggle.addEventListener('click', function() {
-      document.querySelector('.nav-links').classList.toggle('active');
+  const navLinks = document.querySelector('.nav-links');
+
+  if (toggle && navLinks) {
+    toggle.addEventListener('click', function(e) {
+      e.stopPropagation();
+      toggle.classList.toggle('active');
+      navLinks.classList.toggle('active');
+    });
+
+    navLinks.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', function() {
+        toggle.classList.remove('active');
+        navLinks.classList.remove('active');
+      });
+    });
+
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.nav-container')) {
+        toggle.classList.remove('active');
+        navLinks.classList.remove('active');
+      }
     });
   }
 
