@@ -35,6 +35,25 @@
         <form method="POST" action="/order" id="order-form">
           <h3>Your Information</h3>
           <div class="form-group">
+            <label>Order Type *</label>
+            <div class="order-type-select">
+              <label class="order-type-option">
+                <input type="radio" name="order_type" value="pickup" checked onchange="toggleDelivery()">
+                <span class="order-type-label">
+                  <span class="order-type-icon">🏪</span>
+                  <span>Pick Up</span>
+                </span>
+              </label>
+              <label class="order-type-option">
+                <input type="radio" name="order_type" value="delivery" onchange="toggleDelivery()">
+                <span class="order-type-label">
+                  <span class="order-type-icon">🚚</span>
+                  <span>Delivery</span>
+                </span>
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
             <label>Name *</label>
             <input type="text" name="name" required>
           </div>
@@ -46,8 +65,8 @@
             <label>Phone</label>
             <input type="tel" name="phone">
           </div>
-          <div class="form-group">
-            <label>Address</label>
+          <div class="form-group" id="address-group">
+            <label>Delivery Address</label>
             <textarea name="address" rows="2"></textarea>
           </div>
           <div class="form-group">
@@ -128,5 +147,10 @@
       btn.classList.toggle('active', btn.textContent.toLowerCase() === category || (category === 'all' && btn.textContent === 'All'));
     });
   }
+  function toggleDelivery() {
+    const isDelivery = document.querySelector('input[name="order_type"]:checked').value === 'delivery';
+    document.getElementById('address-group').style.display = isDelivery ? 'block' : 'none';
+  }
+  toggleDelivery();
 </script>
 <%- include('partials/footer') %>

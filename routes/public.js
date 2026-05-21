@@ -41,7 +41,7 @@ module.exports = function(upload) {
   });
 
   router.post('/order', async (req, res) => {
-    const { name, email, phone, address, items, notes } = req.body;
+    const { name, email, phone, address, items, notes, order_type } = req.body;
     if (!items || items.length === 0) {
       return res.redirect('/order?error=empty');
     }
@@ -52,7 +52,7 @@ module.exports = function(upload) {
       customerId = customers[0].id;
     } else {
       customerId = await db.run("INSERT INTO customers (name, email, phone, address) VALUES (?, ?, ?, ?)",
-        [name, email, phone, address]);
+        [name, email, phone, address || '']);
     }
 
     const parsedItems = typeof items === 'string' ? JSON.parse(items) : items;
@@ -64,8 +64,8 @@ module.exports = function(upload) {
       }
     }
 
-    const orderId = await db.run("INSERT INTO orders (customer_id, order_type, status, total, notes) VALUES (?, 'online', 'pending', ?, ?)",
-      [customerId, total, notes || '']);
+    const orderId = await db.run("INSERT INTO orders (customer_id, order_type, status, total, notes) VALUES (?, ?, 'pending', ?, ?)",
+      [customerId, order_type || 'pickup', total, notes || '']);
 
     for (const item of parsedItems) {
       const product = await db.query("SELECT price FROM products WHERE id = ?", [item.product_id]);

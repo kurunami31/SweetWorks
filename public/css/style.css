@@ -433,6 +433,44 @@ a:hover { color: var(--primary-dark); }
 
 .hidden { display: none; }
 
+.order-type-select {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+.order-type-option {
+  cursor: pointer;
+}
+.order-type-option input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.order-type-label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  transition: all 0.2s;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+.order-type-option input:checked + .order-type-label {
+  border-color: var(--primary);
+  background: var(--accent-light);
+  color: var(--primary-dark);
+}
+.order-type-label:hover {
+  border-color: var(--accent);
+}
+.order-type-icon {
+  font-size: 1.3rem;
+}
+
 /* Confirmation */
 .confirmation {
   text-align: center;
