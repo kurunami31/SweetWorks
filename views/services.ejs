@@ -12,7 +12,13 @@
       <% services.forEach(service => { %>
         <div class="service-card" id="service-<%= service.id %>">
           <div class="service-card-header">
-            <span class="service-type-badge <%= service.type %>"><%= service.type === 'buffet' ? 'Sweet Buffet' : 'Custom Cake' %></span>
+            <span class="service-type-badge <%= service.type %>">
+              <% if (service.type === 'buffet') { %>
+                <%= service.name.includes('Intimate') ? '🤝 Intimate' : service.name.includes('Fancy') ? '✨ Fancy' : service.name.includes('Magnificent') ? '👑 Magnificent' : 'Sweet Buffet' %>
+              <% } else { %>
+                🎨 Custom Cake
+              <% } %>
+            </span>
             <h2><%= service.name %></h2>
           </div>
           <div class="service-card-body">
@@ -132,16 +138,16 @@
 function showOrderForm(serviceId) {
   const serviceCards = document.querySelectorAll('.service-card');
   let serviceName = '';
-  let serviceType = '';
+  let isBuffet = false;
   serviceCards.forEach(card => {
     if (card.id === 'service-' + serviceId) {
       serviceName = card.querySelector('h2').textContent;
-      serviceType = card.querySelector('.service-type-badge').textContent.trim();
+      isBuffet = card.querySelector('.service-type-badge').classList.contains('buffet');
     }
   });
   document.getElementById('form-service-id').value = serviceId;
   document.getElementById('modal-service-name').textContent = 'Order: ' + serviceName;
-  document.getElementById('quotation-notice').style.display = serviceType === 'Sweet Buffet' ? 'block' : 'none';
+  document.getElementById('quotation-notice').style.display = isBuffet ? 'block' : 'none';
   const inspoUpload = document.getElementById('inspo-upload');
   inspoUpload.style.display = serviceId === 2 ? 'block' : 'none';
   document.getElementById('service-order-modal').classList.remove('hidden');
