@@ -23,11 +23,16 @@
         <span class="stat-number"><%= lowStock %></span>
         <span class="stat-label">Unavailable</span>
       </div>
+      <div class="stat-card">
+        <span class="stat-number"><%= pendingServiceOrders %></span>
+        <span class="stat-label">Pending Services</span>
+      </div>
     </div>
     <div class="admin-nav">
       <a href="/admin/products" class="admin-nav-card">Manage Products</a>
       <a href="/admin/orders" class="admin-nav-card">Manage Orders</a>
       <a href="/admin/customers" class="admin-nav-card">Manage Customers</a>
+      <a href="/admin/service-orders" class="admin-nav-card">Service Orders</a>
       <a href="/pos" class="admin-nav-card">POS System</a>
     </div>
     <h2 style="margin-top:2rem">Recent Orders</h2>

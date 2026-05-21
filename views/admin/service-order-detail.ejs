@@ -1,0 +1,47 @@
+<%- include('../partials/header') %>
+<section class="section">
+  <div class="container">
+    <div class="flex-between">
+      <h1 class="section-title" style="margin:0">Service Order #<%= order.id %></h1>
+      <a href="/admin/service-orders" class="btn">&larr; Back</a>
+    </div>
+    <div class="form-card">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div>
+          <p><strong>Customer:</strong> <%= order.customer_name %></p>
+          <p><strong>Email:</strong> <%= order.customer_email %></p>
+          <p><strong>Phone:</strong> <%= order.customer_phone || 'N/A' %></p>
+          <p><strong>Service:</strong> <%= order.service_name %></p>
+          <p><strong>Status:</strong> <span class="status-badge <%= order.status %>"><%= order.status %></span></p>
+          <p><strong>Date:</strong> <%= new Date(order.created_at).toLocaleString() %></p>
+        </div>
+        <div>
+          <% if (order.inspo_image) { %>
+            <p><strong>Inspiration Photo:</strong></p>
+            <a href="/uploads/<%= order.inspo_image %>" target="_blank">
+              <img src="/uploads/<%= order.inspo_image %>" style="max-width:100%;max-height:300px;border-radius:8px;border:1px solid var(--border)">
+            </a>
+          <% } %>
+        </div>
+      </div>
+      <div style="margin-top:1rem">
+        <p><strong>Details:</strong></p>
+        <p style="white-space:pre-wrap;background:var(--bg);padding:1rem;border-radius:8px"><%= order.details || 'No details provided' %></p>
+      </div>
+    </div>
+    <div class="form-card">
+      <h3>Update Status</h3>
+      <form method="POST" action="/admin/service-orders/<%= order.id %>/status" style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap">
+        <select name="status" class="form-group" style="margin:0;padding:0.5rem;border:1px solid var(--border);border-radius:6px;font-family:'Inter',sans-serif">
+          <option value="pending" <%= order.status === 'pending' ? 'selected' : '' %>>Pending</option>
+          <option value="reviewing" <%= order.status === 'reviewing' ? 'selected' : '' %>>Reviewing</option>
+          <option value="accepted" <%= order.status === 'accepted' ? 'selected' : '' %>>Accepted</option>
+          <option value="completed" <%= order.status === 'completed' ? 'selected' : '' %>>Completed</option>
+          <option value="cancelled" <%= order.status === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
+        </select>
+        <button type="submit" class="btn btn-primary">Update</button>
+      </form>
+    </div>
+  </div>
+</section>
+<%- include('../partials/footer') %>

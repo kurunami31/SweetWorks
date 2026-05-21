@@ -148,6 +148,31 @@ async function initDb() {
         created_at TIMESTAMP DEFAULT NOW()
       )
     `);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS services (
+        id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL,
+        slug TEXT NOT NULL UNIQUE,
+        description TEXT,
+        price NUMERIC(10,2) NOT NULL DEFAULT 0,
+        type TEXT NOT NULL DEFAULT 'custom-cake',
+        available INTEGER DEFAULT 1
+      )
+    `);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS service_orders (
+        id SERIAL PRIMARY KEY,
+        service_id INTEGER REFERENCES services(id),
+        customer_name TEXT NOT NULL,
+        customer_email TEXT NOT NULL,
+        customer_phone TEXT,
+        details TEXT,
+        inspo_image TEXT,
+        status TEXT NOT NULL DEFAULT 'pending',
+        notes TEXT,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
     return;
   }
 
@@ -158,6 +183,8 @@ async function initDb() {
   d.run("CREATE TABLE IF NOT EXISTS orders (id INTEGER PRIMARY KEY AUTOINCREMENT, customer_id INTEGER, order_type TEXT NOT NULL DEFAULT 'online', status TEXT NOT NULL DEFAULT 'pending', total REAL NOT NULL DEFAULT 0, notes TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (customer_id) REFERENCES customers(id))");
   d.run("CREATE TABLE IF NOT EXISTS order_items (id INTEGER PRIMARY KEY AUTOINCREMENT, order_id INTEGER NOT NULL, product_id INTEGER NOT NULL, quantity INTEGER NOT NULL DEFAULT 1, price REAL NOT NULL, FOREIGN KEY (order_id) REFERENCES orders(id), FOREIGN KEY (product_id) REFERENCES products(id))");
   d.run("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT NOT NULL UNIQUE, email TEXT NOT NULL UNIQUE, password TEXT NOT NULL, role TEXT NOT NULL DEFAULT 'admin', created_at DATETIME DEFAULT CURRENT_TIMESTAMP)");
+  d.run("CREATE TABLE IF NOT EXISTS services (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, slug TEXT NOT NULL UNIQUE, description TEXT, price REAL NOT NULL DEFAULT 0, type TEXT NOT NULL DEFAULT 'custom-cake', available INTEGER DEFAULT 1)");
+  d.run("CREATE TABLE IF NOT EXISTS service_orders (id INTEGER PRIMARY KEY AUTOINCREMENT, service_id INTEGER, customer_name TEXT NOT NULL, customer_email TEXT NOT NULL, customer_phone TEXT, details TEXT, inspo_image TEXT, status TEXT NOT NULL DEFAULT 'pending', notes TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (service_id) REFERENCES services(id))");
   saveSqlite();
 }
 
@@ -239,6 +266,27 @@ async function seedData() {
   saveSqlite();
 }
 
+async function seedServices() {
+  if (usePg) {
+    const pool = await getPgPool();
+    const result = await pool.query("SELECT COUNT(*) as c FROM services");
+    if (parseInt(result.rows[0].c) > 0) return;
+    await pool.query("INSERT INTO services (name, slug, description, price, type, available) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT DO NOTHING",
+      ['Sweet Buffet', 'sweet-buffet', 'All-you-can-enjoy dessert buffet with assorted cakes, pastries, cookies, and beverages. Perfect for parties, weddings, and corporate events. Includes setup and serving staff.', 15000.00, 'buffet', 1]);
+    await pool.query("INSERT INTO services (name, slug, description, price, type, available) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT DO NOTHING",
+      ['Customized Cake', 'customized-cake', 'Fully customized cake designed to your vision. Choose flavors, fillings, frosting, size, and decorations. Upload your inspiration photo and we will bring it to life!', 0, 'custom-cake', 1]);
+    return;
+  }
+  const d = await getSqlite();
+  const count = d.exec("SELECT COUNT(*) as c FROM services");
+  if (count.length > 0 && count[0].values[0][0] > 0) return;
+  await run("INSERT INTO services (name, slug, description, price, type, available) VALUES (?, ?, ?, ?, ?, ?)",
+    ['Sweet Buffet', 'sweet-buffet', 'All-you-can-enjoy dessert buffet with assorted cakes, pastries, cookies, and beverages. Perfect for parties, weddings, and corporate events. Includes setup and serving staff.', 15000.00, 'buffet', 1]);
+  await run("INSERT INTO services (name, slug, description, price, type, available) VALUES (?, ?, ?, ?, ?, ?)",
+    ['Customized Cake', 'customized-cake', 'Fully customized cake designed to your vision. Choose flavors, fillings, frosting, size, and decorations. Upload your inspiration photo and we will bring it to life!', 0, 'custom-cake', 1]);
+  saveSqlite();
+}
+
 async function seedAdmin() {
   const bcrypt = require('bcryptjs');
   if (usePg) {
@@ -258,4 +306,4 @@ async function seedAdmin() {
     ['admin', 'admin@sweetworks.com', hash, 'admin']);
 }
 
-module.exports = { initDb, seedData, seedAdmin, query, run, getDb };
+module.exports = { initDb, seedData, seedServices, seedAdmin, query, run, getDb };

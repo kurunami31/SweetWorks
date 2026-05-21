@@ -11,8 +11,11 @@ router.get('/', async (req, res) => {
     "SELECT o.*, c.name as customer_name FROM orders o JOIN customers c ON o.customer_id = c.id ORDER BY o.created_at DESC LIMIT 5"
   );
   const lowStock = (await db.query("SELECT COUNT(*) as count FROM products WHERE available = 0"))[0].count;
+  const serviceOrderCount = (await db.query("SELECT COUNT(*) as count FROM service_orders"))[0].count;
+  const pendingServiceOrders = (await db.query("SELECT COUNT(*) as count FROM service_orders WHERE status = 'pending'"))[0].count;
   res.render('admin/dashboard', {
-    productCount, orderCount, customerCount, pendingOrders, recentOrders, lowStock
+    productCount, orderCount, customerCount, pendingOrders, recentOrders, lowStock,
+    serviceOrderCount, pendingServiceOrders
   });
 });
 
@@ -121,6 +124,28 @@ router.post('/customers/:id/edit', async (req, res) => {
   await db.run("UPDATE customers SET name=?, email=?, phone=?, address=?, notes=? WHERE id=?",
     [name, email, phone, address, notes, req.params.id]);
   res.redirect(`/admin/customers/${req.params.id}`);
+});
+
+router.get('/service-orders', async (req, res) => {
+  const orders = await db.query(
+    "SELECT so.*, s.name as service_name FROM service_orders so LEFT JOIN services s ON so.service_id = s.id ORDER BY so.created_at DESC"
+  );
+  res.render('admin/service-orders', { orders });
+});
+
+router.get('/service-orders/:id', async (req, res) => {
+  const order = await db.query(
+    "SELECT so.*, s.name as service_name, s.type as service_type, s.price as service_price FROM service_orders so LEFT JOIN services s ON so.service_id = s.id WHERE so.id=?",
+    [req.params.id]
+  );
+  if (order.length === 0) return res.redirect('/admin/service-orders');
+  res.render('admin/service-order-detail', { order: order[0] });
+});
+
+router.post('/service-orders/:id/status', async (req, res) => {
+  const { status } = req.body;
+  await db.run("UPDATE service_orders SET status=? WHERE id=?", [status, req.params.id]);
+  res.redirect(`/admin/service-orders/${req.params.id}`);
 });
 
 module.exports = router;
