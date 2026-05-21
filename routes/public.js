@@ -5,9 +5,10 @@ module.exports = function(upload) {
   const router = express.Router();
 
   router.get('/', async (req, res) => {
-    const featured = await db.query("SELECT * FROM products WHERE featured = 1 AND available = 1");
+    const featured = await db.query("SELECT p.*, c.name as category_name FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.featured = 1 AND p.available = 1");
     const categories = await db.query("SELECT * FROM categories");
-    res.render('index', { featured, categories });
+    const services = await db.query("SELECT * FROM services WHERE available = 1 ORDER BY name");
+    res.render('index', { featured, categories, services });
   });
 
   router.get('/menu', async (req, res) => {
