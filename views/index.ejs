@@ -1,0 +1,47 @@
+<%- include('partials/header') %>
+<section class="hero">
+  <div class="container hero-content">
+    <h1>Freshly Baked with Love</h1>
+    <p>Artisan pastries, cakes, and breads made daily in our bakery.</p>
+    <div class="hero-buttons">
+      <a href="/menu" class="btn btn-primary">View Our Menu</a>
+      <a href="/order" class="btn btn-secondary">Order Online</a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">Featured Treats</h2>
+    <div class="product-grid">
+      <% featured.forEach(product => { %>
+        <div class="product-card">
+          <div class="product-card-body">
+            <h3><%= product.name %></h3>
+            <p class="product-description"><%= product.description %></p>
+            <p class="product-price">₱<%= product.price.toFixed(2) %></p>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+    <div class="text-center" style="margin-top:2rem">
+      <a href="/menu" class="btn btn-primary">See Full Menu</a>
+    </div>
+  </div>
+</section>
+
+<section class="section bg-soft">
+  <div class="container">
+    <h2 class="section-title">Our Categories</h2>
+    <div class="categories-grid">
+      <% categories.forEach(cat => { %>
+        <a href="/menu?category=<%= cat.slug %>" class="category-card">
+          <h3><%= cat.name %></h3>
+          <p><%= cat.description %></p>
+        </a>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

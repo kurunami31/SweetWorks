@@ -1,0 +1,27 @@
+<%- include('../partials/header') %>
+<section class="section">
+  <div class="container">
+    <h1 class="section-title">Customers</h1>
+    <form method="GET" class="search-form">
+      <input type="text" name="search" placeholder="Search customers..." value="<%= search %>">
+      <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+    <table class="table">
+      <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Orders</th></tr></thead>
+      <tbody>
+        <% customers.forEach(c => { %>
+          <tr>
+            <td><a href="/admin/customers/<%= c.id %>"><%= c.name %></a></td>
+            <td><%= c.email || '-' %></td>
+            <td><%= c.phone || '-' %></td>
+            <td><%= c.order_count %></td>
+          </tr>
+        <% }) %>
+        <% if (customers.length === 0) { %>
+          <tr><td colspan="4" class="text-center">No customers found</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</section>
+<%- include('../partials/footer') %>

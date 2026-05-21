@@ -1,0 +1,28 @@
+<%- include('partials/header') %>
+<section class="section">
+  <div class="container">
+    <h1 class="section-title">Our Menu</h1>
+    <div class="menu-filters">
+      <a href="/menu" class="filter-btn <%= activeCategory === '' ? 'active' : '' %>">All</a>
+      <% categories.forEach(cat => { %>
+        <a href="/menu?category=<%= cat.slug %>" class="filter-btn <%= activeCategory === cat.slug ? 'active' : '' %>"><%= cat.name %></a>
+      <% }) %>
+    </div>
+    <div class="product-grid">
+      <% products.forEach(product => { %>
+        <div class="product-card">
+          <div class="product-card-body">
+            <span class="product-category"><%= product.category_name %></span>
+            <h3><%= product.name %></h3>
+            <p class="product-description"><%= product.description %></p>
+            <p class="product-price">₱<%= product.price.toFixed(2) %></p>
+          </div>
+        </div>
+      <% }) %>
+      <% if (products.length === 0) { %>
+        <p class="empty-state">No products in this category yet.</p>
+      <% } %>
+    </div>
+  </div>
+</section>
+<%- include('partials/footer') %>

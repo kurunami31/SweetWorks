@@ -1,0 +1,15 @@
+{
+  "name": "sweetworks-pastry-shop",
+  "version": "1.0.0",
+  "description": "SweetWorks Pastry Shop - Website, Admin Dashboard & POS System",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^4.21.0",
+    "sql.js": "^1.11.0"
+  }
+}

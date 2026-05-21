@@ -1,0 +1,6 @@
+node_modules/
+sweetworks.db
+server_out.txt
+server_err.txt
+.env
+App/

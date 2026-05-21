@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Receipt - Order #<%= order.id %></title>
+  <style>
+    body{font-family:monospace;font-size:12px;width:280px;margin:20px auto;padding:10px}
+    .receipt{text-align:center}
+    .receipt-header{margin-bottom:10px;border-bottom:1px dashed #000;padding-bottom:10px}
+    .receipt-items{text-align:left;margin-bottom:10px}
+    .receipt-line{display:flex;justify-content:space-between;padding:2px 0}
+    .receipt-total{border-top:1px solid #000;padding-top:5px;text-align:right;font-size:14px}
+    .receipt-footer{margin-top:10px;border-top:1px dashed #000;padding-top:10px}
+    .btn{display:inline-block;padding:8px 16px;background:#333;color:#fff;text-decoration:none;border:none;cursor:pointer;margin-top:10px}
+  </style>
+</head>
+<body>
+  <div class="receipt">
+    <div class="receipt-header">
+      <h1>SweetWorks</h1>
+      <p>Pastry Shop</p>
+      <p>Order #<%= order.id %></p>
+      <p><%= new Date(order.created_at).toLocaleString() %></p>
+      <% if (order.customer_name) { %><p>Customer: <%= order.customer_name %></p><% } %>
+    </div>
+    <div class="receipt-items">
+      <% items.forEach(item => { %>
+        <div class="receipt-line">
+          <span><%= item.product_name %> × <%= item.quantity %></span>
+          <span>₱<%= (item.price * item.quantity).toFixed(2) %></span>
+        </div>
+      <% }) %>
+    </div>
+    <div class="receipt-total">
+      <strong>Total: ₱<%= order.total.toFixed(2) %></strong>
+    </div>
+    <div class="receipt-footer">
+      <p>Thank you for visiting!</p>
+    </div>
+  </div>
+  <div style="text-align:center">
+    <button class="btn" onclick="window.print()">Print</button>
+    <a href="/pos" class="btn">New Sale</a>
+  </div>
+</body>
+</html>

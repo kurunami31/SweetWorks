@@ -1,0 +1,51 @@
+<%- include('../partials/header') %>
+<section class="section">
+  <div class="container">
+    <h1 class="section-title">Admin Dashboard</h1>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-number"><%= productCount %></span>
+        <span class="stat-label">Products</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number"><%= orderCount %></span>
+        <span class="stat-label">Total Orders</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number"><%= pendingOrders %></span>
+        <span class="stat-label">Pending Orders</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number"><%= customerCount %></span>
+        <span class="stat-label">Customers</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number"><%= lowStock %></span>
+        <span class="stat-label">Unavailable</span>
+      </div>
+    </div>
+    <div class="admin-nav">
+      <a href="/admin/products" class="admin-nav-card">Manage Products</a>
+      <a href="/admin/orders" class="admin-nav-card">Manage Orders</a>
+      <a href="/admin/customers" class="admin-nav-card">Manage Customers</a>
+      <a href="/pos" class="admin-nav-card">POS System</a>
+    </div>
+    <h2 style="margin-top:2rem">Recent Orders</h2>
+    <table class="table">
+      <thead><tr><th>#</th><th>Customer</th><th>Type</th><th>Status</th><th>Total</th><th>Date</th></tr></thead>
+      <tbody>
+        <% recentOrders.forEach(o => { %>
+          <tr>
+            <td><a href="/admin/orders/<%= o.id %>">#<%= o.id %></a></td>
+            <td><%= o.customer_name %></td>
+            <td><%= o.order_type %></td>
+            <td><span class="status-badge <%= o.status %>"><%= o.status %></span></td>
+            <td>₱<%= o.total.toFixed(2) %></td>
+            <td><%= new Date(o.created_at).toLocaleDateString() %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</section>
+<%- include('../partials/footer') %>

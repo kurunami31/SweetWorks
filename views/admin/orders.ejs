@@ -1,0 +1,31 @@
+<%- include('../partials/header') %>
+<section class="section">
+  <div class="container">
+    <h1 class="section-title">Orders</h1>
+    <div class="menu-filters">
+      <a href="/admin/orders" class="filter-btn <%= activeStatus === '' ? 'active' : '' %>">All</a>
+      <a href="/admin/orders?status=pending" class="filter-btn <%= activeStatus === 'pending' ? 'active' : '' %>">Pending</a>
+      <a href="/admin/orders?status=completed" class="filter-btn <%= activeStatus === 'completed' ? 'active' : '' %>">Completed</a>
+      <a href="/admin/orders?status=cancelled" class="filter-btn <%= activeStatus === 'cancelled' ? 'active' : '' %>">Cancelled</a>
+    </div>
+    <table class="table">
+      <thead><tr><th>#</th><th>Customer</th><th>Type</th><th>Status</th><th>Total</th><th>Date</th></tr></thead>
+      <tbody>
+        <% orders.forEach(o => { %>
+          <tr>
+            <td><a href="/admin/orders/<%= o.id %>">#<%= o.id %></a></td>
+            <td><%= o.customer_name %></td>
+            <td><%= o.order_type %></td>
+            <td><span class="status-badge <%= o.status %>"><%= o.status %></span></td>
+            <td>₱<%= o.total.toFixed(2) %></td>
+            <td><%= new Date(o.created_at).toLocaleDateString() %></td>
+          </tr>
+        <% }) %>
+        <% if (orders.length === 0) { %>
+          <tr><td colspan="6" class="text-center">No orders found</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</section>
+<%- include('../partials/footer') %>

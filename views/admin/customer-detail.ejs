@@ -1,0 +1,38 @@
+<%- include('../partials/header') %>
+<section class="section">
+  <div class="container">
+    <a href="/admin/customers" class="btn" style="margin-bottom:1rem">← Back to Customers</a>
+    <h1 class="section-title"><%= customer.name %></h1>
+    <form method="POST" action="/admin/customers/<%= customer.id %>/edit" class="form-card">
+      <div class="form-row">
+        <div class="form-group"><label>Name</label><input name="name" value="<%= customer.name %>" required></div>
+        <div class="form-group"><label>Email</label><input name="email" value="<%= customer.email || '' %>"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Phone</label><input name="phone" value="<%= customer.phone || '' %>"></div>
+        <div class="form-group"><label>Address</label><input name="address" value="<%= customer.address || '' %>"></div>
+      </div>
+      <div class="form-group"><label>Notes</label><textarea name="notes" rows="2"><%= customer.notes || '' %></textarea></div>
+      <button type="submit" class="btn btn-primary">Save Changes</button>
+    </form>
+    <h2 style="margin-top:2rem">Order History</h2>
+    <table class="table">
+      <thead><tr><th>#</th><th>Type</th><th>Status</th><th>Total</th><th>Date</th></tr></thead>
+      <tbody>
+        <% orders.forEach(o => { %>
+          <tr>
+            <td><a href="/admin/orders/<%= o.id %>">#<%= o.id %></a></td>
+            <td><%= o.order_type %></td>
+            <td><span class="status-badge <%= o.status %>"><%= o.status %></span></td>
+            <td>₱<%= o.total.toFixed(2) %></td>
+            <td><%= new Date(o.created_at).toLocaleDateString() %></td>
+          </tr>
+        <% }) %>
+        <% if (orders.length === 0) { %>
+          <tr><td colspan="5" class="text-center">No orders yet</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</section>
+<%- include('../partials/footer') %>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SweetWorks POS</title>
+  <link rel="icon" type="image/x-icon" href="/images/SweetWorks(logo).ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/pos.css">
+</head>
+<body>
+  <div class="pos-container">
+    <header class="pos-header">
+      <div class="pos-header-left">
+        <img src="/images/SweetWorks(logo).jpg" alt="SweetWorks" class="pos-logo">
+        <h1>Point of Sale</h1>
+      </div>
+      <div class="pos-header-right">
+        <a href="/admin" class="pos-nav-btn">Admin</a>
+        <a href="/" class="pos-nav-btn">Website</a>
+      </div>
+    </header>
+
+    <div class="pos-layout">
+      <div class="pos-products">
+        <div class="pos-categories">
+          <button class="pos-cat-btn active" onclick="filterPOS('all')">All</button>
+          <% categories.forEach(cat => { %>
+            <button class="pos-cat-btn" onclick="filterPOS('<%= cat.slug %>')"><%= cat.name %></button>
+          <% }) %>
+        </div>
+        <div class="pos-product-grid" id="pos-product-grid">
+          <% products.forEach(p => { %>
+            <button class="pos-product-btn" data-category="<%= p.category_name.toLowerCase() %>" onclick="posAdd(<%= p.id %>, '<%= p.name.replace(/'/g, "\\'") %>', <%= p.price %>)">
+              <strong><%= p.name %></strong>
+              <span>₱<%= p.price.toFixed(2) %></span>
+            </button>
+          <% }) %>
+        </div>
+      </div>
+      <div class="pos-cart">
+        <div class="pos-cart-header">
+          <h2>Current Sale</h2>
+          <div class="pos-customer-select">
+            <select id="pos-customer" onchange="updateCustomer()">
+              <option value="">Walk-in Customer</option>
+              <% customers.forEach(c => { %>
+                <option value="<%= c.id %>"><%= c.name %></option>
+              <% }) %>
+              <option value="new">+ New Customer</option>
+            </select>
+          </div>
+        </div>
+        <div class="pos-cart-items" id="pos-cart-items">
+          <p class="empty-state">Scan or tap items to add</p>
+        </div>
+        <div class="pos-cart-footer">
+          <div class="pos-total">
+            <span>Total:</span>
+            <span id="pos-total">₱0.00</span>
+          </div>
+          <div class="pos-actions">
+            <button class="pos-btn pos-btn-danger" onclick="posClear()">Clear</button>
+            <button class="pos-btn pos-btn-primary" id="pos-checkout-btn" onclick="posCheckout()" disabled>Checkout</button>
+          </div>
+          <div class="pos-payment" id="pos-payment">
+            <label>Payment Method:</label>
+            <select id="pos-payment-method">
+              <option value="Cash">Cash</option>
+              <option value="Card">Card</option>
+              <option value="Mobile Pay">Mobile Pay</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="pos-receipt-modal" class="modal hidden">
+      <div class="modal-content" id="receipt-content">
+        <button class="modal-close" onclick="closeReceipt()">✕</button>
+        <div id="receipt-print"></div>
+        <div class="modal-actions">
+          <button class="pos-btn pos-btn-primary" onclick="closeReceipt()">New Sale</button>
+          <button class="pos-btn" onclick="printReceipt()">Print Receipt</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="pos-new-customer-modal" class="modal hidden">
+      <div class="modal-content">
+        <button class="modal-close" onclick="closeNewCustomer()">✕</button>
+        <h2>New Customer</h2>
+        <div class="form-group"><label>Name</label><input id="new-cust-name" required></div>
+        <div class="form-group"><label>Email</label><input id="new-cust-email" type="email"></div>
+        <div class="form-group"><label>Phone</label><input id="new-cust-phone"></div>
+        <button class="pos-btn pos-btn-primary" onclick="createCustomer()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let posCart = [];
+    let posCustomer = '';
+
+    function filterPOS(category) {
+      document.querySelectorAll('.pos-product-btn').forEach(b => {
+        b.style.display = (category === 'all' || b.dataset.category === category) ? '' : 'none';
+      });
+      document.querySelectorAll('.pos-cat-btn').forEach(b => {
+        b.classList.toggle('active', b.textContent.toLowerCase() === category || (category === 'all' && b.textContent === 'All'));
+      });
+    }
+
+    function posAdd(id, name, price) {
+      const existing = posCart.find(i => i.product_id === id);
+      if (existing) {
+        existing.quantity++;
+      } else {
+        posCart.push({ product_id: id, name, price, quantity: 1 });
+      }
+      renderPOS();
+    }
+
+    function posRemove(id) {
+      posCart = posCart.filter(i => i.product_id !== id);
+      renderPOS();
+    }
+
+    function posUpdateQty(id, delta) {
+      const item = posCart.find(i => i.product_id === id);
+      if (item) {
+        item.quantity = Math.max(1, item.quantity + delta);
+        renderPOS();
+      }
+    }
+
+    function posClear() {
+      if (posCart.length === 0) return;
+      if (!confirm('Clear current sale?')) return;
+      posCart = [];
+      renderPOS();
+    }
+
+    function renderPOS() {
+      const el = document.getElementById('pos-cart-items');
+      const totalEl = document.getElementById('pos-total');
+      const checkoutBtn = document.getElementById('pos-checkout-btn');
+
+      if (posCart.length === 0) {
+        el.innerHTML = '<p class="empty-state">Scan or tap items to add</p>';
+        totalEl.textContent = '₱0.00';
+        checkoutBtn.disabled = true;
+        return;
+      }
+
+      let html = '';
+      let total = 0;
+      posCart.forEach(item => {
+        const sub = item.price * item.quantity;
+        total += sub;
+        html += `<div class="pos-cart-item">
+          <div class="pos-item-info">
+            <strong>${item.name}</strong>
+            <div class="pos-qty">
+              <button onclick="posUpdateQty(${item.product_id}, -1)">−</button>
+              <span>${item.quantity}</span>
+              <button onclick="posUpdateQty(${item.product_id}, 1)">+</button>
+            </div>
+          </div>
+          <div class="pos-item-total">
+            <span>₱${sub.toFixed(2)}</span>
+            <button class="pos-remove-btn" onclick="posRemove(${item.product_id})">✕</button>
+          </div>
+        </div>`;
+      });
+      el.innerHTML = html;
+      totalEl.textContent = '₱' + total.toFixed(2);
+      checkoutBtn.disabled = false;
+    }
+
+    function updateCustomer() {
+      const sel = document.getElementById('pos-customer');
+      if (sel.value === 'new') {
+        document.getElementById('pos-new-customer-modal').classList.remove('hidden');
+        sel.value = '';
+      } else {
+        posCustomer = sel.value;
+      }
+    }
+
+    function closeNewCustomer() {
+      document.getElementById('pos-new-customer-modal').classList.add('hidden');
+    }
+
+    function createCustomer() {
+      const name = document.getElementById('new-cust-name').value;
+      const email = document.getElementById('new-cust-email').value;
+      const phone = document.getElementById('new-cust-phone').value;
+      if (!name) return alert('Name is required');
+
+      fetch('/pos/customer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, phone })
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          const sel = document.getElementById('pos-customer');
+          const opt = document.createElement('option');
+          opt.value = data.customer.id;
+          opt.textContent = data.customer.name;
+          opt.selected = true;
+          sel.insertBefore(opt, sel.lastElementChild);
+          posCustomer = data.customer.id;
+          closeNewCustomer();
+          document.getElementById('new-cust-name').value = '';
+          document.getElementById('new-cust-email').value = '';
+          document.getElementById('new-cust-phone').value = '';
+        }
+      });
+    }
+
+    function posCheckout() {
+      if (posCart.length === 0) return;
+      const method = document.getElementById('pos-payment-method').value;
+
+      fetch('/pos/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customer_id: posCustomer || null,
+          payment: method,
+          items: posCart.map(i => ({ product_id: i.product_id, quantity: i.quantity }))
+        })
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          showReceipt(data);
+          posCart = [];
+          renderPOS();
+        }
+      });
+    }
+
+    function showReceipt(data) {
+      const el = document.getElementById('receipt-print');
+      const order = data.order;
+      const items = data.items;
+      let html = `<div class="receipt">
+        <div class="receipt-header">
+          <h2>SweetWorks</h2>
+          <p>Pastry Shop</p>
+          <p>Order #${order.id}</p>
+          <p>${new Date(order.created_at).toLocaleString()}</p>
+          <p>Payment: ${order.notes || 'N/A'}</p>
+        </div>
+        <div class="receipt-items">`;
+      items.forEach(item => {
+        html += `<div class="receipt-line">
+          <span>${item.product_name} × ${item.quantity}</span>
+          <span>₱${(item.price * item.quantity).toFixed(2)}</span>
+        </div>`;
+      });
+      html += `</div>
+        <div class="receipt-total">
+          <strong>Total: ₱${order.total.toFixed(2)}</strong>
+        </div>
+        <div class="receipt-footer">
+          <p>Thank you for visiting!</p>
+        </div>
+      </div>`;
+      el.innerHTML = html;
+      document.getElementById('pos-receipt-modal').classList.remove('hidden');
+    }
+
+    function closeReceipt() {
+      document.getElementById('pos-receipt-modal').classList.add('hidden');
+    }
+
+    function printReceipt() {
+      const content = document.getElementById('receipt-print').innerHTML;
+      const win = window.open('', '', 'width=300,height=600');
+      win.document.write(`<html><head><style>
+        body{font-family:monospace;font-size:12px;width:280px;margin:0 auto;padding:10px}
+        .receipt{text-align:center}
+        .receipt-header{margin-bottom:10px;border-bottom:1px dashed #000;padding-bottom:10px}
+        .receipt-items{text-align:left;margin-bottom:10px}
+        .receipt-line{display:flex;justify-content:space-between;padding:2px 0}
+        .receipt-total{border-top:1px solid #000;padding-top:5px;text-align:right;font-size:14px}
+        .receipt-footer{margin-top:10px;border-top:1px dashed #000;padding-top:10px}
+      </style></head><body>${content}</body></html>`);
+      win.document.close();
+      win.focus();
+      win.print();
+      win.close();
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeReceipt();
+        closeNewCustomer();
+      }
+    });
+  </script>
+</body>
+</html>

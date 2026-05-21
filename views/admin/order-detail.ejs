@@ -1,0 +1,48 @@
+<%- include('../partials/header') %>
+<section class="section">
+  <div class="container">
+    <a href="/admin/orders" class="btn" style="margin-bottom:1rem">← Back to Orders</a>
+    <h1 class="section-title">Order #<%= order.id %></h1>
+    <div class="order-detail-layout">
+      <div class="form-card">
+        <h3>Customer Info</h3>
+        <p><strong>Name:</strong> <%= order.customer_name %></p>
+        <p><strong>Email:</strong> <%= order.email %></p>
+        <p><strong>Phone:</strong> <%= order.phone || '-' %></p>
+        <p><strong>Address:</strong> <%= order.address || '-' %></p>
+      </div>
+      <div class="form-card">
+        <h3>Order Info</h3>
+        <p><strong>Type:</strong> <%= order.order_type %></p>
+        <p><strong>Status:</strong> <span class="status-badge <%= order.status %>"><%= order.status %></span></p>
+        <p><strong>Date:</strong> <%= new Date(order.created_at).toLocaleString() %></p>
+        <p><strong>Notes:</strong> <%= order.notes || '-' %></p>
+        <form method="POST" action="/admin/orders/<%= order.id %>/status" style="margin-top:1rem">
+          <label>Update Status:</label>
+          <select name="status">
+            <option value="pending" <%= order.status === 'pending' ? 'selected' : '' %>>Pending</option>
+            <option value="completed" <%= order.status === 'completed' ? 'selected' : '' %>>Completed</option>
+            <option value="cancelled" <%= order.status === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
+          </select>
+          <button type="submit" class="btn btn-sm btn-primary">Update</button>
+        </form>
+      </div>
+    </div>
+    <h2>Items</h2>
+    <table class="table">
+      <thead><tr><th>Product</th><th>Qty</th><th>Price</th><th>Subtotal</th></tr></thead>
+      <tbody>
+        <% items.forEach(item => { %>
+          <tr>
+            <td><%= item.product_name %></td>
+            <td><%= item.quantity %></td>
+            <td>₱<%= item.price.toFixed(2) %></td>
+            <td>₱<%= (item.price * item.quantity).toFixed(2) %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+      <tfoot><tr><td colspan="3"><strong>Total</strong></td><td><strong>₱<%= order.total.toFixed(2) %></strong></td></tr></tfoot>
+    </table>
+  </div>
+</section>
+<%- include('../partials/footer') %>

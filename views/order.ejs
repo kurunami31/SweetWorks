@@ -1,0 +1,132 @@
+<%- include('partials/header') %>
+<section class="section">
+  <div class="container">
+    <h1 class="section-title">Order Online</h1>
+    <div class="order-layout">
+      <div class="order-products">
+        <h2>Products</h2>
+        <div class="menu-filters">
+          <button class="filter-btn active" onclick="filterOrderProducts('all')">All</button>
+          <% categories.forEach(cat => { %>
+            <button class="filter-btn" onclick="filterOrderProducts('<%= cat.slug %>')"><%= cat.name %></button>
+          <% }) %>
+        </div>
+        <div class="product-grid" id="order-product-list">
+          <% products.forEach(product => { %>
+            <div class="product-card" data-category="<%= product.category_name.toLowerCase() %>">
+              <div class="product-card-body">
+                <span class="product-category"><%= product.category_name %></span>
+                <h3><%= product.name %></h3>
+                <p class="product-price">₱<%= product.price.toFixed(2) %></p>
+                <button class="btn btn-sm btn-primary" onclick="addToCart(<%= product.id %>, '<%= product.name.replace(/'/g, "\\'") %>', <%= product.price %>)">Add to Order</button>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+      <div class="order-cart">
+        <h2>Your Order</h2>
+        <div id="cart-items">
+          <p class="empty-state">Your cart is empty</p>
+        </div>
+        <div class="cart-total">
+          <strong>Total: $<span id="cart-total">0.00</span></strong>
+        </div>
+        <form method="POST" action="/order" id="order-form">
+          <h3>Your Information</h3>
+          <div class="form-group">
+            <label>Name *</label>
+            <input type="text" name="name" required>
+          </div>
+          <div class="form-group">
+            <label>Email *</label>
+            <input type="email" name="email" required>
+          </div>
+          <div class="form-group">
+            <label>Phone</label>
+            <input type="tel" name="phone">
+          </div>
+          <div class="form-group">
+            <label>Address</label>
+            <textarea name="address" rows="2"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Notes</label>
+            <textarea name="notes" rows="2"></textarea>
+          </div>
+          <input type="hidden" name="items" id="cart-data">
+          <button type="submit" class="btn btn-primary" id="submit-order" disabled>Place Order</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+  let cart = [];
+  function addToCart(id, name, price) {
+    const existing = cart.find(i => i.product_id === id);
+    if (existing) {
+      existing.quantity++;
+    } else {
+      cart.push({ product_id: id, name, price, quantity: 1 });
+    }
+    renderCart();
+  }
+  function removeFromCart(id) {
+    cart = cart.filter(i => i.product_id !== id);
+    renderCart();
+  }
+  function updateQty(id, delta) {
+    const item = cart.find(i => i.product_id === id);
+    if (item) {
+      item.quantity = Math.max(1, item.quantity + delta);
+      renderCart();
+    }
+  }
+  function renderCart() {
+    const el = document.getElementById('cart-items');
+    const totalEl = document.getElementById('cart-total');
+    const submitBtn = document.getElementById('submit-order');
+    if (cart.length === 0) {
+      el.innerHTML = '<p class="empty-state">Your cart is empty</p>';
+      totalEl.textContent = '0.00';
+      submitBtn.disabled = true;
+      document.getElementById('cart-data').value = '[]';
+      return;
+    }
+    let html = '';
+    let total = 0;
+    cart.forEach(item => {
+      const subtotal = item.price * item.quantity;
+      total += subtotal;
+      html += `<div class="cart-item">
+        <div class="cart-item-info">
+          <strong>${item.name}</strong>
+          <div class="cart-item-qty">
+            <button type="button" onclick="updateQty(${item.product_id}, -1)">-</button>
+            <span>${item.quantity}</span>
+            <button type="button" onclick="updateQty(${item.product_id}, 1)">+</button>
+          </div>
+        </div>
+        <div class="cart-item-total">
+          ₱${subtotal.toFixed(2)}
+          <button type="button" class="btn-remove" onclick="removeFromCart(${item.product_id})">✕</button>
+        </div>
+      </div>`;
+    });
+    el.innerHTML = html;
+    totalEl.textContent = total.toFixed(2);
+    submitBtn.disabled = false;
+    document.getElementById('cart-data').value = JSON.stringify(cart.map(i => ({ product_id: i.product_id, quantity: i.quantity })));
+  }
+  function filterOrderProducts(category) {
+    document.querySelectorAll('#order-product-list .product-card').forEach(card => {
+      const cats = card.dataset.category;
+      card.style.display = (category === 'all' || cats === category) ? '' : 'none';
+    });
+    document.querySelectorAll('.order-products .filter-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.textContent.toLowerCase() === category || (category === 'all' && btn.textContent === 'All'));
+    });
+  }
+</script>
+<%- include('partials/footer') %>

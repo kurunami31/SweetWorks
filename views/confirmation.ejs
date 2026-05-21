@@ -1,0 +1,29 @@
+<%- include('partials/header') %>
+<section class="section">
+  <div class="container confirmation">
+    <div class="confirmation-icon">✓</div>
+    <h1>Order Confirmed!</h1>
+    <p>Thank you, <strong><%= order.customer_name %></strong>! Your order #<%= order.id %> has been placed.</p>
+    <div class="order-summary">
+      <h2>Order #<%= order.id %></h2>
+      <p>Status: <span class="status-badge pending"><%= order.status %></span></p>
+      <table class="table">
+        <thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Subtotal</th></tr></thead>
+        <tbody>
+          <% items.forEach(item => { %>
+            <tr>
+              <td><%= item.product_name %></td>
+              <td><%= item.quantity %></td>
+              <td>₱<%= item.price.toFixed(2) %></td>
+              <td>₱<%= (item.price * item.quantity).toFixed(2) %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+        <tfoot><tr><td colspan="3"><strong>Total</strong></td><td><strong>₱<%= order.total.toFixed(2) %></strong></td></tr></tfoot>
+      </table>
+    </div>
+    <p>A confirmation email will be sent to <strong><%= order.customer_email %></strong>.</p>
+    <a href="/menu" class="btn btn-primary">Continue Shopping</a>
+  </div>
+</section>
+<%- include('partials/footer') %>
