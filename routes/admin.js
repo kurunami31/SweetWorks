@@ -3,16 +3,21 @@ const router = express.Router();
 const db = require('../database');
 const { decrypt, decryptCustomerFields } = require('../security');
 
+router.use(async (req, res, next) => {
+  res.locals.pendingOrders = (await db.query("SELECT COUNT(*) as count FROM orders WHERE status = 'pending'"))[0].count;
+  res.locals.pendingServiceOrders = (await db.query("SELECT COUNT(*) as count FROM service_orders WHERE status = 'pending'"))[0].count;
+  next();
+});
+
 router.get('/', async (req, res) => {
   const productCount = (await db.query("SELECT COUNT(*) as count FROM products"))[0].count;
   const orderCount = (await db.query("SELECT COUNT(*) as count FROM orders"))[0].count;
   const customerCount = (await db.query("SELECT COUNT(*) as count FROM customers"))[0].count;
-  const pendingOrders = (await db.query("SELECT COUNT(*) as count FROM orders WHERE status = 'pending'"))[0].count;
   const serviceOrderCount = (await db.query("SELECT COUNT(*) as count FROM service_orders"))[0].count;
-  const pendingServiceOrders = (await db.query("SELECT COUNT(*) as count FROM service_orders WHERE status = 'pending'"))[0].count;
   res.render('admin/dashboard', {
-    productCount, orderCount, customerCount, pendingOrders,
-    serviceOrderCount, pendingServiceOrders
+    currentPage: 'dashboard',
+    productCount, orderCount, customerCount,
+    serviceOrderCount
   });
 });
 
@@ -21,7 +26,7 @@ router.get('/products', async (req, res) => {
     "SELECT p.*, c.name as category_name FROM products p LEFT JOIN categories c ON p.category_id = c.id ORDER BY p.name"
   );
   const categories = await db.query("SELECT * FROM categories");
-  res.render('admin/products', { products, categories });
+  res.render('admin/products', { currentPage: 'products', products, categories });
 });
 
 router.post('/products', async (req, res) => {
@@ -72,7 +77,7 @@ router.get('/orders', async (req, res) => {
     );
   }
   orders.forEach(o => { if (o.customer_name) o.customer_name = decrypt(o.customer_name); });
-  res.render('admin/orders', { orders, activeStatus: status });
+  res.render('admin/orders', { currentPage: 'orders', orders, activeStatus: status });
 });
 
 router.get('/orders/:id', async (req, res) => {
@@ -86,7 +91,7 @@ router.get('/orders/:id', async (req, res) => {
     "SELECT oi.*, p.name as product_name FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE oi.order_id = ?",
     [req.params.id]
   );
-  res.render('admin/order-detail', { order: order[0], items });
+  res.render('admin/order-detail', { currentPage: 'orders', order: order[0], items });
 });
 
 router.post('/orders/:id/status', async (req, res) => {
@@ -109,7 +114,7 @@ router.get('/customers', async (req, res) => {
     );
   }
   customers.forEach(c => decryptCustomerFields(c));
-  res.render('admin/customers', { customers, search });
+  res.render('admin/customers', { currentPage: 'customers', customers, search });
 });
 
 router.get('/customers/:id', async (req, res) => {
@@ -117,7 +122,7 @@ router.get('/customers/:id', async (req, res) => {
   if (customer.length === 0) return res.redirect('/admin/customers');
   decryptCustomerFields(customer[0]);
   const orders = await db.query("SELECT * FROM orders WHERE customer_id=? ORDER BY created_at DESC", [req.params.id]);
-  res.render('admin/customer-detail', { customer: customer[0], orders });
+  res.render('admin/customer-detail', { currentPage: 'customers', customer: customer[0], orders });
 });
 
 router.post('/customers/:id/edit', async (req, res) => {
@@ -132,7 +137,7 @@ router.get('/service-orders', async (req, res) => {
     "SELECT so.*, s.name as service_name FROM service_orders so LEFT JOIN services s ON so.service_id = s.id ORDER BY so.created_at DESC"
   );
   orders.forEach(o => { if (o.customer_name) o.customer_name = decrypt(o.customer_name); });
-  res.render('admin/service-orders', { orders });
+  res.render('admin/service-orders', { currentPage: 'service-orders', orders });
 });
 
 router.get('/service-orders/:id', async (req, res) => {
@@ -141,7 +146,7 @@ router.get('/service-orders/:id', async (req, res) => {
     [req.params.id]
   );
   if (order.length === 0) return res.redirect('/admin/service-orders');
-  res.render('admin/service-order-detail', { order: order[0] });
+  res.render('admin/service-order-detail', { currentPage: 'service-orders', order: order[0] });
 });
 
 router.post('/service-orders/:id/status', async (req, res) => {

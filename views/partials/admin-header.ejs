@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SweetWorks Admin</title>
+  <link rel="icon" type="image/x-icon" href="/images/SweetWorks(logo).ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .admin-layout {
+      display: flex;
+      min-height: calc(100vh - 4rem);
+      margin-top: 4rem;
+    }
+    .admin-sidebar {
+      width: 200px;
+      background: var(--primary-dark);
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      padding: 0.75rem;
+      position: fixed;
+      top: 4rem;
+      left: 0;
+      bottom: 0;
+      z-index: 50;
+    }
+    .admin-sidebar-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.7rem 0.75rem;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      color: rgba(255,255,255,0.6);
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      text-decoration: none;
+      font-family: 'Inter', sans-serif;
+      position: relative;
+    }
+    .admin-sidebar-btn:hover { background: rgba(255,255,255,0.1); color: var(--white); }
+    .admin-sidebar-btn.active { background: rgba(255,255,255,0.15); color: var(--white); }
+    .admin-sidebar-btn .icon { font-size: 1.2rem; }
+    .admin-sidebar-badge {
+      margin-left: auto;
+      background: var(--danger);
+      color: white;
+      font-size: 0.6rem;
+      font-weight: 700;
+      padding: 0.1rem 0.4rem;
+      border-radius: 8px;
+    }
+    .admin-content {
+      flex: 1;
+      margin-left: 200px;
+      padding: 2rem;
+      overflow-y: auto;
+    }
+    @media (max-width: 768px) {
+      .admin-sidebar {
+        width: 100%;
+        position: static;
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 0.5rem;
+        gap: 0.25rem;
+      }
+      .admin-sidebar-btn { font-size: 0.75rem; padding: 0.5rem 0.6rem; }
+      .admin-sidebar-btn .icon { font-size: 1rem; }
+      .admin-content { margin-left: 0; padding: 1rem; }
+      .admin-layout { flex-direction: column; margin-top: 0; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar" style="position:fixed;top:0;left:0;right:0;z-index:100">
+    <div class="container nav-container">
+      <a href="/home" class="nav-logo">
+        <img src="/images/SweetWorks(logo).jpg" alt="SweetWorks" class="nav-logo-img">
+        <span>SweetWorks</span>
+      </a>
+      <div style="display:flex;align-items:center;gap:0.5rem">
+        <span style="font-size:0.8rem;color:var(--text-light)"><%= user?.username %></span>
+        <a href="/pos" class="btn btn-sm">POS</a>
+        <a href="/home" class="btn btn-sm">Website</a>
+        <a href="/logout" class="btn btn-sm" style="color:var(--danger)">Logout</a>
+      </div>
+    </div>
+  </nav>
+  <div class="admin-layout">
+    <div class="admin-sidebar">
+      <a href="/admin" class="admin-sidebar-btn <%= currentPage === 'dashboard' ? 'active' : '' %>">
+        <span class="icon">🏠</span> Dashboard
+      </a>
+      <a href="/admin/products" class="admin-sidebar-btn <%= currentPage === 'products' ? 'active' : '' %>">
+        <span class="icon">📦</span> Products
+      </a>
+      <a href="/admin/orders" class="admin-sidebar-btn <%= currentPage === 'orders' ? 'active' : '' %>">
+        <span class="icon">📋</span> Orders
+        <% if (typeof pendingOrders !== 'undefined' && pendingOrders > 0) { %><span class="admin-sidebar-badge"><%= pendingOrders %></span><% } %>
+      </a>
+      <a href="/admin/customers" class="admin-sidebar-btn <%= currentPage === 'customers' ? 'active' : '' %>">
+        <span class="icon">👥</span> Customers
+      </a>
+      <a href="/admin/service-orders" class="admin-sidebar-btn <%= currentPage === 'service-orders' ? 'active' : '' %>">
+        <span class="icon">🎂</span> Services
+        <% if (typeof pendingServiceOrders !== 'undefined' && pendingServiceOrders > 0) { %><span class="admin-sidebar-badge"><%= pendingServiceOrders %></span><% } %>
+      </a>
+    </div>
+    <div class="admin-content">
