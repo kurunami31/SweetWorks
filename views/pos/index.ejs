@@ -215,7 +215,7 @@
               <div class="pos-order-card-body">
                 <p class="pos-order-customer">👤 ${o.customer_name || 'Guest'}</p>
                 ${o.customer_email ? `<p class="pos-order-email">✉️ ${o.customer_email}</p>` : ''}
-                <p class="pos-order-time">🕐 ${new Date(o.created_at).toLocaleString()}</p>
+                <p class="pos-order-time">🕐 ${new Date(o.created_at).toLocaleString('en-PH', { timeZone: 'Asia/Manila' })}</p>
                 <p class="pos-order-notes">${o.notes || ''}</p>
                 <p class="pos-order-total">Total: ₱${parseFloat(o.total).toFixed(2)}</p>
               </div>
@@ -425,7 +425,7 @@
           <h2>SweetWorks</h2>
           <p>Pastry Shop</p>
           <p>Order #${order.id}</p>
-          <p>${new Date(order.created_at).toLocaleString()}</p>
+          <p>${new Date(order.created_at).toLocaleString('en-PH', { timeZone: 'Asia/Manila' })}</p>
           <p>Payment: ${order.notes || 'N/A'}</p>
         </div>
         <div class="receipt-items">`;

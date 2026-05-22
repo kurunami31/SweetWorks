@@ -15,7 +15,7 @@
         <h3>Order Info</h3>
         <p><strong>Type:</strong> <%= order.order_type === 'delivery' ? '🚚 Delivery' : '🏪 Pick Up' %></p>
         <p><strong>Status:</strong> <span class="status-badge <%= order.status %>"><%= order.status %></span></p>
-        <p><strong>Date:</strong> <%= new Date(order.created_at).toLocaleString() %></p>
+        <p><strong>Date:</strong> <%= new Date(order.created_at).toLocaleString('en-PH', { timeZone: 'Asia/Manila' }) %></p>
         <% if (order.notes) { %>
           <p><strong>Schedule/Notes:</strong> <%= order.notes.replace(/\|/g, '<br>') %></p>
         <% } %>

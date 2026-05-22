@@ -34,7 +34,7 @@ function to12h(t) {
       <h1>SweetWorks</h1>
       <p>Pastry Shop</p>
       <p>Order #<%= order.id %></p>
-      <p><%= new Date(order.created_at).toLocaleString() %></p>
+      <p><%= new Date(order.created_at).toLocaleString('en-PH', { timeZone: 'Asia/Manila' }) %></p>
       <% if (order.customer_name) { %><p>Customer: <%= order.customer_name %></p><% } %>
     </div>
     <% if (order.notes) { 
