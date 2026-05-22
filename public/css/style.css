@@ -834,9 +834,17 @@ a:hover { color: var(--primary-dark); }
   .service-preview-card { padding: 1.5rem; }
 
   .order-layout { grid-template-columns: 1fr; }
-  .order-cart { position: static; }
+  .order-cart { position: static; padding: 1rem; }
   .order-layout .order-products .product-grid { grid-template-columns: repeat(2, 1fr); }
   .order-type-select { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+  .order-cart .cart-item { padding: 0.5rem 0; }
+  .order-cart .cart-item-qty button { width: 24px; height: 24px; font-size: 0.8rem; }
+  .order-cart .cart-total { font-size: 1rem; padding: 0.5rem 0; }
+  .order-cart h3 { font-size: 0.95rem; }
+  .order-cart .form-group { margin-bottom: 0.6rem; }
+  .order-cart .form-group label { font-size: 0.8rem; }
+  .order-cart input, .order-cart textarea, .order-cart select { padding: 0.45rem 0.6rem; font-size: 0.85rem; }
+  .order-products .product-card .btn { font-size: 0.7rem; padding: 0.3rem 0.5rem; }
 
   .form-row { grid-template-columns: 1fr; }
   .order-detail-layout { grid-template-columns: 1fr; }
@@ -914,6 +922,8 @@ a:hover { color: var(--primary-dark); }
   .section-title { font-size: 1.3rem; }
   .order-type-select { grid-template-columns: 1fr; }
   .order-type-label { font-size: 0.85rem; padding: 0.6rem 0.75rem; }
+  .order-cart { padding: 0.75rem; }
+  .order-cart .btn-primary { font-size: 0.85rem; padding: 0.6rem 1rem; }
 
   .nav-logo span { font-size: 1.1rem; }
   .nav-logo-img { height: 30px; }
