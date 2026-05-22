@@ -1,35 +1,52 @@
 <%- include('../partials/admin-header') %>
 <section class="section">
   <div class="container">
-    <h1 class="section-title">Orders</h1>
-    <div class="menu-filters">
-      <a href="/admin/orders" class="filter-btn <%= activeStatus === '' ? 'active' : '' %>">All</a>
-      <a href="/admin/orders?status=pending" class="filter-btn <%= activeStatus === 'pending' ? 'active' : '' %>">Pending</a>
-      <a href="/admin/orders?status=completed" class="filter-btn <%= activeStatus === 'completed' ? 'active' : '' %>">Completed</a>
-      <a href="/admin/orders?status=cancelled" class="filter-btn <%= activeStatus === 'cancelled' ? 'active' : '' %>">Cancelled</a>
+    <div class="flex-between">
+      <h1 class="section-title" style="margin:0">Orders</h1>
+      <div class="menu-filters">
+        <a href="/admin/orders" class="filter-btn <%= activeStatus === '' ? 'active' : '' %>">All</a>
+        <a href="/admin/orders?status=pending" class="filter-btn <%= activeStatus === 'pending' ? 'active' : '' %>">Pending</a>
+        <a href="/admin/orders?status=preparing" class="filter-btn <%= activeStatus === 'preparing' ? 'active' : '' %>">Preparing</a>
+        <a href="/admin/orders?status=ready" class="filter-btn <%= activeStatus === 'ready' ? 'active' : '' %>">Ready</a>
+        <a href="/admin/orders?status=completed" class="filter-btn <%= activeStatus === 'completed' ? 'active' : '' %>">Completed</a>
+        <a href="/admin/orders?status=cancelled" class="filter-btn <%= activeStatus === 'cancelled' ? 'active' : '' %>">Cancelled</a>
+      </div>
     </div>
     <table class="table">
-      <thead><tr><th>#</th><th>Customer</th><th>Type</th><th>Status</th><th>Total</th><th>Date</th></tr></thead>
+      <thead><tr><th>#</th><th>Customer</th><th>Type</th><th>Status</th><th>Total</th><th>Date</th><th>Action</th></tr></thead>
       <tbody>
         <% orders.forEach(o => { %>
           <tr>
             <td><a href="/admin/orders/<%= o.id %>">#<%= o.id %></a></td>
             <td><%= o.customer_name %></td>
-            <td><%= o.order_type %></td>
+            <td><%= o.order_type === 'delivery' ? '🚚' : '🏪' %> <%= o.order_type %></td>
             <td><span class="status-badge <%= o.status %>"><%= o.status %></span></td>
             <td>₱<%= o.total.toFixed(2) %></td>
             <td><%= new Date(o.created_at).toLocaleDateString() %></td>
+            <td class="action-cell" style="white-space:nowrap">
+              <form method="POST" action="/admin/orders/<%= o.id %>/status" style="display:inline">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <select name="status" onchange="this.form.submit()" style="font-size:0.75rem;padding:0.2rem 0.4rem;border:1px solid var(--border);border-radius:4px;font-family:'Inter',sans-serif">
+                  <option value="pending" <%= o.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                  <option value="preparing" <%= o.status === 'preparing' ? 'selected' : '' %>>Preparing</option>
+                  <option value="ready" <%= o.status === 'ready' ? 'selected' : '' %>>Ready</option>
+                  <option value="completed" <%= o.status === 'completed' ? 'selected' : '' %>>Completed</option>
+                  <option value="cancelled" <%= o.status === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
+                </select>
+              </form>
+              <a href="/admin/orders/<%= o.id %>" class="btn btn-sm" style="margin-left:0.25rem">View</a>
+            </td>
           </tr>
         <% }) %>
         <% if (orders.length === 0) { %>
-          <tr><td colspan="6" class="text-center">No orders found</td></tr>
+          <tr><td colspan="7" class="text-center">No orders found</td></tr>
         <% } %>
       </tbody>
     </table>
   </div>
 </section>
 <script>
-  const hasPending = <%= orders.some(o => o.status === 'pending') %>;
+  const hasPending = <%= orders.some(o => o.status === 'pending' || o.status === 'preparing' || o.status === 'ready') %>;
   if (hasPending) {
     setTimeout(() => location.reload(), 10000);
   }
