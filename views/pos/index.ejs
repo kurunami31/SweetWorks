@@ -24,55 +24,75 @@
     </header>
 
     <div class="pos-layout">
-      <div class="pos-products">
-        <div class="pos-categories">
-          <button class="pos-cat-btn active" onclick="filterPOS('all')">All</button>
-          <% categories.forEach(cat => { %>
-            <button class="pos-cat-btn" onclick="filterPOS('<%= cat.slug %>')"><%= cat.name %></button>
-          <% }) %>
+      <div class="pos-sidebar">
+        <button class="pos-tab-btn active" onclick="switchPOTab('pos')" id="tab-pos">
+          <span>🛒</span> POS
+        </button>
+        <button class="pos-tab-btn" onclick="switchPOTab('orders')" id="tab-orders">
+          <span>📋</span> Orders
+          <span class="pos-order-badge hidden" id="pos-order-badge">0</span>
+        </button>
+      </div>
+      <div class="pos-main" id="pos-panel-pos">
+        <div class="pos-products">
+          <div class="pos-categories">
+            <button class="pos-cat-btn active" onclick="filterPOS('all')">All</button>
+            <% categories.forEach(cat => { %>
+              <button class="pos-cat-btn" onclick="filterPOS('<%= cat.slug %>')"><%= cat.name %></button>
+            <% }) %>
+          </div>
+          <div class="pos-product-grid" id="pos-product-grid">
+            <% products.forEach(p => { %>
+              <button class="pos-product-btn" data-category="<%= p.category_name.toLowerCase() %>" onclick="posAdd(<%= p.id %>, '<%= p.name.replace(/'/g, "\\'") %>', <%= p.price %>)">
+                <strong><%= p.name %></strong>
+                <span>₱<%= p.price.toFixed(2) %></span>
+              </button>
+            <% }) %>
+          </div>
         </div>
-        <div class="pos-product-grid" id="pos-product-grid">
-          <% products.forEach(p => { %>
-            <button class="pos-product-btn" data-category="<%= p.category_name.toLowerCase() %>" onclick="posAdd(<%= p.id %>, '<%= p.name.replace(/'/g, "\\'") %>', <%= p.price %>)">
-              <strong><%= p.name %></strong>
-              <span>₱<%= p.price.toFixed(2) %></span>
-            </button>
-          <% }) %>
+        <div class="pos-cart">
+          <div class="pos-cart-header">
+            <h2>Current Sale</h2>
+            <div class="pos-customer-select">
+              <select id="pos-customer" onchange="updateCustomer()">
+                <option value="">Walk-in Customer</option>
+                <% customers.forEach(c => { %>
+                  <option value="<%= c.id %>"><%= c.name %></option>
+                <% }) %>
+                <option value="new">+ New Customer</option>
+              </select>
+            </div>
+          </div>
+          <div class="pos-cart-items" id="pos-cart-items">
+            <p class="empty-state">Scan or tap items to add</p>
+          </div>
+          <div class="pos-cart-footer">
+            <div class="pos-total">
+              <span>Total:</span>
+              <span id="pos-total">₱0.00</span>
+            </div>
+            <div class="pos-actions">
+              <button class="pos-btn pos-btn-danger" onclick="posClear()">Clear</button>
+              <button class="pos-btn pos-btn-primary" id="pos-checkout-btn" onclick="posCheckout()" disabled>Checkout</button>
+            </div>
+            <div class="pos-payment" id="pos-payment">
+              <label>Payment Method:</label>
+              <select id="pos-payment-method">
+                <option value="Cash">Cash</option>
+                <option value="Card">Card</option>
+                <option value="Mobile Pay">Mobile Pay</option>
+              </select>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="pos-cart">
-        <div class="pos-cart-header">
-          <h2>Current Sale</h2>
-          <div class="pos-customer-select">
-            <select id="pos-customer" onchange="updateCustomer()">
-              <option value="">Walk-in Customer</option>
-              <% customers.forEach(c => { %>
-                <option value="<%= c.id %>"><%= c.name %></option>
-              <% }) %>
-              <option value="new">+ New Customer</option>
-            </select>
-          </div>
+      <div class="pos-main hidden" id="pos-panel-orders">
+        <div class="pos-orders-header">
+          <h2>📋 Online Orders</h2>
+          <span class="pos-orders-subtitle">Real-time orders from website</span>
         </div>
-        <div class="pos-cart-items" id="pos-cart-items">
-          <p class="empty-state">Scan or tap items to add</p>
-        </div>
-        <div class="pos-cart-footer">
-          <div class="pos-total">
-            <span>Total:</span>
-            <span id="pos-total">₱0.00</span>
-          </div>
-          <div class="pos-actions">
-            <button class="pos-btn pos-btn-danger" onclick="posClear()">Clear</button>
-            <button class="pos-btn pos-btn-primary" id="pos-checkout-btn" onclick="posCheckout()" disabled>Checkout</button>
-          </div>
-          <div class="pos-payment" id="pos-payment">
-            <label>Payment Method:</label>
-            <select id="pos-payment-method">
-              <option value="Cash">Cash</option>
-              <option value="Card">Card</option>
-              <option value="Mobile Pay">Mobile Pay</option>
-            </select>
-          </div>
+        <div class="pos-online-orders" id="pos-online-orders">
+          <p class="empty-state">Waiting for online orders...</p>
         </div>
       </div>
     </div>
@@ -103,6 +123,135 @@
   <script>
     let posCart = [];
     let posCustomer = '';
+    let lastOrderCheck = new Date().toISOString();
+    let pollTimer = null;
+
+    function switchPOTab(tab) {
+      document.querySelectorAll('.pos-main').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.pos-tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById('pos-panel-' + tab).classList.remove('hidden');
+      document.getElementById('tab-' + tab).classList.add('active');
+      if (tab === 'orders') pollOnlineOrders();
+    }
+
+    function playNotification() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.setValueAtTime(880, ctx.currentTime);
+        osc.frequency.setValueAtTime(660, ctx.currentTime + 0.15);
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.4);
+      } catch(e) {}
+    }
+
+    function pollOnlineOrders() {
+      if (pollTimer) clearTimeout(pollTimer);
+      fetch('/api/pending-orders?since=' + encodeURIComponent(lastOrderCheck))
+        .then(r => r.json())
+        .then(orders => {
+          if (orders.length > 0) {
+            lastOrderCheck = new Date().toISOString();
+            const newOrders = orders.filter(o => o.status === 'pending');
+            if (newOrders.length > 0) {
+              playNotification();
+              updateOrderBadge();
+            }
+            renderOnlineOrders();
+          }
+          pollTimer = setTimeout(pollOnlineOrders, 5000);
+        })
+        .catch(() => {
+          pollTimer = setTimeout(pollOnlineOrders, 5000);
+        });
+    }
+
+    function updateOrderBadge() {
+      fetch('/api/pending-orders?since=1970-01-01')
+        .then(r => r.json())
+        .then(all => {
+          const pending = all.filter(o => o.status === 'pending');
+          const badge = document.getElementById('pos-order-badge');
+          if (pending.length > 0) {
+            badge.textContent = pending.length;
+            badge.classList.remove('hidden');
+          } else {
+            badge.classList.add('hidden');
+          }
+        })
+        .catch(() => {});
+    }
+
+    function renderOnlineOrders() {
+      fetch('/api/pending-orders?since=1970-01-01')
+        .then(r => r.json())
+        .then(orders => {
+          const el = document.getElementById('pos-online-orders');
+          if (orders.length === 0) {
+            el.innerHTML = '<p class="empty-state">Waiting for online orders...</p>';
+            return;
+          }
+          let html = '';
+          orders.forEach(o => {
+            const statusClass = o.status === 'pending' ? 'status-pending' : o.status === 'preparing' ? 'status-preparing' : o.status === 'ready' ? 'status-ready' : 'status-' + o.status;
+            html += `<div class="pos-order-card ${statusClass}">
+              <div class="pos-order-card-header">
+                <strong>#${o.id}</strong>
+                <span class="pos-order-type">${o.order_type === 'delivery' ? '🚚 Delivery' : '🏪 Pickup'}</span>
+                <span class="pos-order-status ${o.status}">${o.status}</span>
+              </div>
+              <div class="pos-order-card-body">
+                <p class="pos-order-customer">👤 ${o.customer_name || 'Guest'}</p>
+                ${o.customer_email ? `<p class="pos-order-email">✉️ ${o.customer_email}</p>` : ''}
+                <p class="pos-order-time">🕐 ${new Date(o.created_at).toLocaleString()}</p>
+                <p class="pos-order-notes">${o.notes || ''}</p>
+                <p class="pos-order-total">Total: ₱${parseFloat(o.total).toFixed(2)}</p>
+              </div>
+              <div class="pos-order-card-footer">
+                ${o.status === 'pending' ? `<button class="pos-btn pos-btn-sm pos-btn-primary" onclick="updateOrderStatus(${o.id}, 'preparing')">Accept & Prepare</button>` : ''}
+                ${o.status === 'preparing' ? `<button class="pos-btn pos-btn-sm pos-btn-primary" onclick="updateOrderStatus(${o.id}, 'ready')">Mark Ready</button>` : ''}
+                ${o.status === 'ready' ? `<button class="pos-btn pos-btn-sm pos-btn-success" onclick="updateOrderStatus(${o.id}, 'completed')">Complete</button>` : ''}
+                ${o.status === 'pending' || o.status === 'preparing' ? `<button class="pos-btn pos-btn-sm pos-btn-danger" onclick="updateOrderStatus(${o.id}, 'cancelled')">Cancel</button>` : ''}
+              </div>
+            </div>`;
+          });
+          el.innerHTML = html;
+          const pending = orders.filter(o => o.status === 'pending');
+          const badge = document.getElementById('pos-order-badge');
+          if (pending.length > 0) {
+            badge.textContent = pending.length;
+            badge.classList.remove('hidden');
+          } else {
+            badge.classList.add('hidden');
+          }
+        })
+        .catch(() => {});
+    }
+
+    function updateOrderStatus(id, status) {
+      const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+      fetch('/api/orders/' + id + '/status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-csrf-token': csrfToken },
+        body: JSON.stringify({ status })
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          renderOnlineOrders();
+          updateOrderBadge();
+        }
+      });
+    }
+
+    pollOnlineOrders();
+    updateOrderBadge();
+    setInterval(updateOrderBadge, 15000);
 
     function filterPOS(category) {
       document.querySelectorAll('.pos-product-btn').forEach(b => {

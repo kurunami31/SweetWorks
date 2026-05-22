@@ -2,55 +2,80 @@
 <section class="section">
   <div class="container">
     <h1 class="section-title">Admin Dashboard</h1>
-    <div class="stats-grid">
-      <div class="stat-card">
-        <span class="stat-number"><%= productCount %></span>
-        <span class="stat-label">Products</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-number"><%= orderCount %></span>
-        <span class="stat-label">Total Orders</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-number"><%= pendingOrders %></span>
-        <span class="stat-label">Pending Orders</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-number"><%= customerCount %></span>
-        <span class="stat-label">Customers</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-number"><%= lowStock %></span>
-        <span class="stat-label">Unavailable</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-number"><%= pendingServiceOrders %></span>
-        <span class="stat-label">Pending Services</span>
-      </div>
+    <div class="admin-nav-grid">
+      <a href="/admin/products" class="admin-nav-card">
+        <span class="admin-nav-icon">📦</span>
+        <span class="admin-nav-title">Products</span>
+        <span class="admin-nav-count"><%= productCount %></span>
+      </a>
+      <a href="/admin/orders" class="admin-nav-card">
+        <span class="admin-nav-icon">📋</span>
+        <span class="admin-nav-title">Orders</span>
+        <span class="admin-nav-count"><%= orderCount %></span>
+        <% if (pendingOrders > 0) { %><span class="admin-nav-badge"><%= pendingOrders %> pending</span><% } %>
+      </a>
+      <a href="/admin/customers" class="admin-nav-card">
+        <span class="admin-nav-icon">👥</span>
+        <span class="admin-nav-title">Customers</span>
+        <span class="admin-nav-count"><%= customerCount %></span>
+      </a>
+      <a href="/admin/service-orders" class="admin-nav-card">
+        <span class="admin-nav-icon">🎂</span>
+        <span class="admin-nav-title">Services</span>
+        <span class="admin-nav-count"><%= serviceOrderCount %></span>
+        <% if (pendingServiceOrders > 0) { %><span class="admin-nav-badge"><%= pendingServiceOrders %> pending</span><% } %>
+      </a>
     </div>
-    <div class="admin-nav">
-      <a href="/admin/products" class="admin-nav-card">Manage Products</a>
-      <a href="/admin/orders" class="admin-nav-card">Manage Orders</a>
-      <a href="/admin/customers" class="admin-nav-card">Manage Customers</a>
-      <a href="/admin/service-orders" class="admin-nav-card">Service Orders</a>
-      <a href="/pos" class="admin-nav-card">POS System</a>
-    </div>
-    <h2 style="margin-top:2rem">Recent Orders</h2>
-    <table class="table">
-      <thead><tr><th>#</th><th>Customer</th><th>Type</th><th>Status</th><th>Total</th><th>Date</th></tr></thead>
-      <tbody>
-        <% recentOrders.forEach(o => { %>
-          <tr>
-            <td><a href="/admin/orders/<%= o.id %>">#<%= o.id %></a></td>
-            <td><%= o.customer_name %></td>
-            <td><%= o.order_type %></td>
-            <td><span class="status-badge <%= o.status %>"><%= o.status %></span></td>
-            <td>₱<%= o.total.toFixed(2) %></td>
-            <td><%= new Date(o.created_at).toLocaleDateString() %></td>
-          </tr>
-        <% }) %>
-      </tbody>
-    </table>
   </div>
 </section>
+<style>
+.admin-nav-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+.admin-nav-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 2rem 1.5rem;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  text-decoration: none;
+  transition: all 0.2s;
+  position: relative;
+}
+.admin-nav-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(61,90,69,0.1);
+  border-color: var(--accent);
+}
+.admin-nav-icon {
+  font-size: 2.5rem;
+}
+.admin-nav-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+.admin-nav-count {
+  font-size: 0.85rem;
+  color: var(--text-light);
+}
+.admin-nav-badge {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: var(--danger);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 10px;
+  text-transform: uppercase;
+}
+</style>
 <%- include('../partials/footer') %>

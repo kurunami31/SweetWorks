@@ -139,5 +139,21 @@ module.exports = function(upload, fileUploadSecurity) {
     res.json(orders);
   });
 
+  router.get('/api/pending-orders', async (req, res) => {
+    const since = req.query.since || new Date(0).toISOString();
+    const orders = await db.query(
+      "SELECT o.*, c.name as customer_name, c.email as customer_email FROM orders o JOIN customers c ON o.customer_id = c.id WHERE o.created_at > ? AND o.order_type IN ('delivery', 'pickup') ORDER BY o.created_at ASC",
+      [since]
+    );
+    orders.forEach(o => { if (o.customer_name) o.customer_name = decrypt(o.customer_name); });
+    res.json(orders);
+  });
+
+  router.post('/api/orders/:id/status', async (req, res) => {
+    const { status } = req.body;
+    await db.run("UPDATE orders SET status=? WHERE id=?", [status, req.params.id]);
+    res.json({ success: true });
+  });
+
   return router;
 };

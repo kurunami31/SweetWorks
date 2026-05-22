@@ -8,15 +8,10 @@ router.get('/', async (req, res) => {
   const orderCount = (await db.query("SELECT COUNT(*) as count FROM orders"))[0].count;
   const customerCount = (await db.query("SELECT COUNT(*) as count FROM customers"))[0].count;
   const pendingOrders = (await db.query("SELECT COUNT(*) as count FROM orders WHERE status = 'pending'"))[0].count;
-  const recentOrders = await db.query(
-    "SELECT o.*, c.name as customer_name FROM orders o JOIN customers c ON o.customer_id = c.id ORDER BY o.created_at DESC LIMIT 5"
-  );
-  recentOrders.forEach(o => { if (o.customer_name) o.customer_name = decrypt(o.customer_name); });
-  const lowStock = (await db.query("SELECT COUNT(*) as count FROM products WHERE available = 0"))[0].count;
   const serviceOrderCount = (await db.query("SELECT COUNT(*) as count FROM service_orders"))[0].count;
   const pendingServiceOrders = (await db.query("SELECT COUNT(*) as count FROM service_orders WHERE status = 'pending'"))[0].count;
   res.render('admin/dashboard', {
-    productCount, orderCount, customerCount, pendingOrders, recentOrders, lowStock,
+    productCount, orderCount, customerCount, pendingOrders,
     serviceOrderCount, pendingServiceOrders
   });
 });
