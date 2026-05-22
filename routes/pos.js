@@ -70,11 +70,12 @@ router.get('/customers/search', async (req, res) => {
 
 router.get('/receipt/:id', async (req, res) => {
   const order = await db.query(
-    "SELECT o.*, c.name as customer_name FROM orders o LEFT JOIN customers c ON o.customer_id = c.id WHERE o.id=?",
+    "SELECT o.*, c.name as customer_name, c.address as customer_address FROM orders o LEFT JOIN customers c ON o.customer_id = c.id WHERE o.id=?",
     [req.params.id]
   );
   if (order.length === 0) return res.redirect('/pos');
   if (order[0].customer_name) order[0].customer_name = decrypt(order[0].customer_name);
+  if (order[0].customer_address) order[0].customer_address = require('../security').decrypt(order[0].customer_address);
   const items = await db.query(
     "SELECT oi.*, p.name as product_name FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE oi.order_id=?",
     [req.params.id]

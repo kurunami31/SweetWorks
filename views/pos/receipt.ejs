@@ -7,6 +7,8 @@
     body{font-family:monospace;font-size:12px;width:280px;margin:20px auto;padding:10px}
     .receipt{text-align:center}
     .receipt-header{margin-bottom:10px;border-bottom:1px dashed #000;padding-bottom:10px}
+    .receipt-info{text-align:left;font-size:11px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px dashed #000}
+    .receipt-info p{margin:2px 0}
     .receipt-items{text-align:left;margin-bottom:10px}
     .receipt-line{display:flex;justify-content:space-between;padding:2px 0}
     .receipt-total{border-top:1px solid #000;padding-top:5px;text-align:right;font-size:14px}
@@ -23,6 +25,23 @@
       <p><%= new Date(order.created_at).toLocaleString() %></p>
       <% if (order.customer_name) { %><p>Customer: <%= order.customer_name %></p><% } %>
     </div>
+    <% if (order.notes) { 
+      const notes = order.notes;
+      const deliveryDate = notes.match(/Delivery Date:\s*(.+?)(?:\||$)/i);
+      const deliveryTime = notes.match(/Delivery Time:\s*(.+?)(?:\||$)/i);
+      const pickupTime = notes.match(/Pickup Time:\s*(.+?)(?:\||$)/i);
+    %>
+    <div class="receipt-info">
+      <p><strong><%= order.order_type === 'delivery' ? '🚚 Delivery' : '🏪 Pick Up' %></strong></p>
+      <% if (order.order_type === 'delivery') { %>
+        <% if (order.customer_address) { %><p>📍 <%= order.customer_address %></p><% } %>
+        <% if (deliveryDate) { %><p>📅 <%= deliveryDate[1].trim() %></p><% } %>
+        <% if (deliveryTime) { %><p>🕐 <%= deliveryTime[1].trim() %></p><% } %>
+      <% } else { %>
+        <% if (pickupTime) { %><p>🕐 Pickup: <%= pickupTime[1].trim() %></p><% } %>
+      <% } %>
+    </div>
+    <% } %>
     <div class="receipt-items">
       <% items.forEach(item => { %>
         <div class="receipt-line">
