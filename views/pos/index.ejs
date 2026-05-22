@@ -216,6 +216,7 @@
                 ${o.status === 'pending' ? `<button class="pos-btn pos-btn-sm pos-btn-primary" onclick="updateOrderStatus(${o.id}, 'preparing')">Accept & Prepare</button>` : ''}
                 ${o.status === 'preparing' ? `<button class="pos-btn pos-btn-sm pos-btn-primary" onclick="updateOrderStatus(${o.id}, 'ready')">Mark Ready</button>` : ''}
                 ${o.status === 'ready' ? `<button class="pos-btn pos-btn-sm pos-btn-success" onclick="updateOrderStatus(${o.id}, 'completed')">Complete</button>` : ''}
+                ${o.status === 'completed' ? `<button class="pos-btn pos-btn-sm" onclick="printOnlineReceipt(${o.id})">🧾 Receipt</button>` : ''}
                 ${o.status === 'pending' || o.status === 'preparing' ? `<button class="pos-btn pos-btn-sm pos-btn-danger" onclick="updateOrderStatus(${o.id}, 'cancelled')">Cancel</button>` : ''}
               </div>
             </div>`;
@@ -252,6 +253,17 @@
     pollOnlineOrders();
     updateOrderBadge();
     setInterval(updateOrderBadge, 15000);
+
+    function printOnlineReceipt(orderId) {
+      fetch('/pos/receipt/' + orderId)
+        .then(r => r.text())
+        .then(html => {
+          const win = window.open('', '', 'width=380,height=600');
+          win.document.write(html);
+          win.document.close();
+          setTimeout(() => { win.focus(); win.print(); }, 500);
+        });
+    }
 
     function filterPOS(category) {
       document.querySelectorAll('.pos-product-btn').forEach(b => {

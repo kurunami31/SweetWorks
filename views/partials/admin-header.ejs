@@ -106,6 +106,9 @@
       <a href="/admin/customers" class="admin-sidebar-btn <%= currentPage === 'customers' ? 'active' : '' %>">
         <span class="icon">👥</span> Customers
       </a>
+      <a href="/pos" class="admin-sidebar-btn <%= currentPage === 'pos' ? 'active' : '' %>">
+        <span class="icon">🛒</span> POS
+      </a>
       <a href="/admin/service-orders" class="admin-sidebar-btn <%= currentPage === 'service-orders' ? 'active' : '' %>">
         <span class="icon">🎂</span> Services
         <% if (typeof pendingServiceOrders !== 'undefined' && pendingServiceOrders > 0) { %><span class="admin-sidebar-badge"><%= pendingServiceOrders %></span><% } %>
