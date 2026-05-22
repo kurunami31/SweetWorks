@@ -33,6 +33,7 @@
           <strong>Total: ₱<span id="cart-total">0.00</span></strong>
         </div>
         <form method="POST" action="/order" id="order-form">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
           <h3>Your Information</h3>
           <div class="form-group">
             <label>Order Type *</label>

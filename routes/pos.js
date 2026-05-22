@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../database');
+const { encrypt, decrypt, decryptCustomerFields } = require('../security');
 
 router.get('/', async (req, res) => {
   const products = await db.query(
@@ -8,6 +9,7 @@ router.get('/', async (req, res) => {
   );
   const categories = await db.query("SELECT * FROM categories");
   const customers = await db.query("SELECT * FROM customers ORDER BY name");
+  customers.forEach(c => decryptCustomerFields(c));
   res.render('pos/index', { products, categories, customers });
 });
 
@@ -50,8 +52,9 @@ router.post('/checkout', async (req, res) => {
 router.post('/customer', async (req, res) => {
   const { name, email, phone } = req.body;
   if (!name) return res.json({ error: 'Name is required' });
-  const id = await db.run("INSERT INTO customers (name, email, phone) VALUES (?, ?, ?)", [name, email || '', phone || '']);
+  const id = await db.run("INSERT INTO customers (name, email, phone) VALUES (?, ?, ?)", [encrypt(name), email, encrypt(phone || '')]);
   const customer = await db.query("SELECT * FROM customers WHERE id=?", [id]);
+  if (customer.length > 0) decryptCustomerFields(customer[0]);
   res.json({ success: true, customer: customer[0] });
 });
 
@@ -61,6 +64,7 @@ router.get('/customers/search', async (req, res) => {
     "SELECT * FROM customers WHERE name LIKE ? OR email LIKE ? OR phone LIKE ? ORDER BY name LIMIT 20",
     [`%${q}%`, `%${q}%`, `%${q}%`]
   );
+  customers.forEach(c => decryptCustomerFields(c));
   res.json(customers);
 });
 
@@ -70,6 +74,7 @@ router.get('/receipt/:id', async (req, res) => {
     [req.params.id]
   );
   if (order.length === 0) return res.redirect('/pos');
+  if (order[0].customer_name) order[0].customer_name = decrypt(order[0].customer_name);
   const items = await db.query(
     "SELECT oi.*, p.name as product_name FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE oi.order_id=?",
     [req.params.id]

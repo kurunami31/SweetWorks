@@ -71,6 +71,7 @@
     <button class="modal-close" onclick="closeOrderForm()">&times;</button>
     <h2 id="modal-service-name" style="margin-bottom:1rem">Order Service</h2>
     <form method="POST" action="/services" enctype="multipart/form-data" id="service-order-form">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <input type="hidden" name="service_id" id="form-service-id">
       <input type="hidden" name="buffet_tier" id="form-buffet-tier" value="">
       <div id="buffet-tier-selector" style="display:none;margin-bottom:1rem">

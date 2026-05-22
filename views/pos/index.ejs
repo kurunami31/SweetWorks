@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/pos.css">
+  <meta name="csrf-token" content="<%= csrfToken %>">
 </head>
 <body>
   <div class="pos-container">
@@ -199,9 +200,11 @@
       const phone = document.getElementById('new-cust-phone').value;
       if (!name) return alert('Name is required');
 
+      const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
       fetch('/pos/customer', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-csrf-token': csrfToken },
         body: JSON.stringify({ name, email, phone })
       })
       .then(r => r.json())
@@ -228,7 +231,7 @@
 
       fetch('/pos/checkout', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-csrf-token': csrfToken },
         body: JSON.stringify({
           customer_id: posCustomer || null,
           payment: method,

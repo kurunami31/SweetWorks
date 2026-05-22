@@ -1,7 +1,8 @@
 const express = require('express');
 const db = require('../database');
+const { encrypt, decrypt, decryptCustomerFields } = require('../security');
 
-module.exports = function(upload) {
+module.exports = function(upload, fileUploadSecurity) {
   const router = express.Router();
 
   router.get('/', (req, res) => {
@@ -56,7 +57,7 @@ module.exports = function(upload) {
       customerId = customers[0].id;
     } else {
       customerId = await db.run("INSERT INTO customers (name, email, phone, address) VALUES (?, ?, ?, ?)",
-        [name, email, phone, address || '']);
+        [encrypt(name), email, encrypt(phone || ''), encrypt(address || '')]);
     }
 
     const parsedItems = typeof items === 'string' ? JSON.parse(items) : items;
@@ -98,6 +99,7 @@ module.exports = function(upload) {
       [req.params.id]
     );
     if (order.length === 0) return res.redirect('/menu');
+    order[0] = decryptCustomerFields(order[0]);
     const items = await db.query(
       "SELECT oi.*, p.name as product_name FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE oi.order_id = ?",
       [req.params.id]
@@ -110,13 +112,13 @@ module.exports = function(upload) {
     res.render('services', { services, submitted: req.query.submitted });
   });
 
-  router.post('/services', upload.single('inspo_image'), async (req, res) => {
+  router.post('/services', upload.single('inspo_image'), fileUploadSecurity, async (req, res) => {
     const { service_id, customer_name, customer_email, customer_phone, details, buffet_tier } = req.body;
     const inspo_image = req.file ? req.file.filename : null;
     const fullDetails = buffet_tier ? `Buffet Tier: ${buffet_tier}\n${details}` : details;
     await db.run(
       "INSERT INTO service_orders (service_id, customer_name, customer_email, customer_phone, details, inspo_image) VALUES (?, ?, ?, ?, ?, ?)",
-      [service_id, customer_name, customer_email, customer_phone, fullDetails, inspo_image]
+      [service_id, encrypt(customer_name), customer_email, encrypt(customer_phone || ''), fullDetails, inspo_image]
     );
     res.redirect('/services?submitted=1');
   });
@@ -133,6 +135,7 @@ module.exports = function(upload) {
     const orders = await db.query(
       "SELECT o.*, c.name as customer_name FROM orders o JOIN customers c ON o.customer_id = c.id ORDER BY o.created_at DESC LIMIT 50"
     );
+    orders.forEach(o => { if (o.customer_name) o.customer_name = decrypt(o.customer_name); });
     res.json(orders);
   });
 

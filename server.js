@@ -1,14 +1,44 @@
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
+const crypto = require('crypto');
 const multer = require('multer');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const { initDb, seedData, seedServices, seedAdmin } = require('./database');
+const { maliciousRequestDetector, csrfProtection, fileUploadSecurity } = require('./security');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginEmbedderPolicy: false,
+}));
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 300,
+  message: { error: 'Too many requests, please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use(limiter);
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { error: 'Too many login attempts, please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use('/login', authLimiter);
+app.use('/register', authLimiter);
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -24,10 +54,14 @@ if (!require('fs').existsSync(path.join(__dirname, 'uploads'))) {
 }
 
 app.use(session({
-  secret: 'sweetworks-secret-key-change-in-production',
+  secret: process.env.SESSION_SECRET || crypto.randomBytes(64).toString('hex'),
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 24 * 60 * 60 * 1000 }
+  cookie: {
+    maxAge: 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    sameSite: 'strict',
+  }
 }));
 
 app.use((req, res, next) => {
@@ -36,19 +70,19 @@ app.use((req, res, next) => {
     username: req.session.username,
     role: req.session.role
   } : null;
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Content-Type');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  if (req.method === 'OPTIONS') return res.sendStatus(200);
   next();
 });
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+app.use(maliciousRequestDetector);
+
+app.use(csrfProtection);
+
 const { router: authRouter, isAuthenticated } = require('./routes/auth');
 
-app.use('/', require('./routes/public')(upload));
+app.use('/', require('./routes/public')(upload, fileUploadSecurity));
 app.use('/', authRouter);
 app.use('/admin', isAuthenticated, require('./routes/admin'));
 app.use('/pos', isAuthenticated, require('./routes/pos'));

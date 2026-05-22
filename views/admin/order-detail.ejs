@@ -23,6 +23,7 @@
           <p style="color:var(--danger);font-size:0.85rem;margin-top:0.5rem">Transportation/Delivery Fee not included.</p>
         <% } %>
         <form method="POST" action="/admin/orders/<%= order.id %>/status" style="margin-top:1rem">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
           <label>Update Status:</label>
           <select name="status">
             <option value="pending" <%= order.status === 'pending' ? 'selected' : '' %>>Pending</option>

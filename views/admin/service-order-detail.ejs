@@ -32,6 +32,7 @@
     <div class="form-card">
       <h3>Update Status</h3>
       <form method="POST" action="/admin/service-orders/<%= order.id %>/status" style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <select name="status" class="form-group" style="margin:0;padding:0.5rem;border:1px solid var(--border);border-radius:6px;font-family:'Inter',sans-serif">
           <option value="pending" <%= order.status === 'pending' ? 'selected' : '' %>>Pending</option>
           <option value="reviewing" <%= order.status === 'reviewing' ? 'selected' : '' %>>Reviewing</option>
