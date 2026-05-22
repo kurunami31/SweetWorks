@@ -220,10 +220,10 @@
                 <p class="pos-order-total">Total: ₱${parseFloat(o.total).toFixed(2)}</p>
               </div>
               <div class="pos-order-card-footer">
-                ${o.status === 'pending' ? `<button class="pos-btn pos-btn-sm pos-btn-primary" onclick="updateOrderStatus(${o.id}, 'preparing')">Accept & Prepare</button>` : ''}
-                ${o.status === 'preparing' ? `<button class="pos-btn pos-btn-sm pos-btn-primary" onclick="updateOrderStatus(${o.id}, 'ready')">Mark Ready</button>` : ''}
+                ${o.status === 'pending' ? `<button class="pos-btn pos-btn-sm pos-btn-primary" onclick="updateOrderStatus(${o.id}, 'preparing')">Accept</button>` : ''}
+                ${o.status === 'preparing' ? `<button class="pos-btn pos-btn-sm pos-btn-primary" onclick="updateOrderStatus(${o.id}, 'ready')">Ready</button>` : ''}
                 ${o.status === 'ready' ? `<button class="pos-btn pos-btn-sm pos-btn-success" onclick="updateOrderStatus(${o.id}, 'completed')">Complete</button>` : ''}
-                ${o.status === 'completed' ? `<button class="pos-btn pos-btn-sm" onclick="printOnlineReceipt(${o.id})">🧾 Receipt</button>` : ''}
+                <button class="pos-btn pos-btn-sm" onclick="printOnlineReceipt(${o.id})">🧾 Receipt</button>
                 ${o.status === 'pending' || o.status === 'preparing' ? `<button class="pos-btn pos-btn-sm pos-btn-danger" onclick="updateOrderStatus(${o.id}, 'cancelled')">Cancel</button>` : ''}
               </div>
             </div>`;
