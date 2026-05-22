@@ -13,7 +13,7 @@
         <% if (service.type === 'buffet') { %>
           <div class="service-card" id="service-<%= service.id %>">
             <div class="service-card-header">
-              <span class="service-type-badge">🍰 Sweet Buffet</span>
+              <span class="service-type-badge"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Sweet Buffet</span>
               <h2><%= service.name %></h2>
               <p class="service-header-desc"><%= service.description %></p>
             </div>
@@ -21,7 +21,7 @@
               <p class="service-price">Quotation-based</p>
               <div class="buffet-tiers">
                 <div class="buffet-tier" onclick="selectBuffetTier(this, 'intimate')">
-                  <span class="buffet-tier-icon">🤝</span>
+                  <span class="buffet-tier-icon"><svg viewBox="0 0 24 24" width="1.5rem" height="1.5rem" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
                   <div class="buffet-tier-info">
                     <strong>Intimate</strong>
                     <span>10–20 guests</span>
@@ -29,7 +29,7 @@
                   </div>
                 </div>
                 <div class="buffet-tier" onclick="selectBuffetTier(this, 'fancy')">
-                  <span class="buffet-tier-icon">✨</span>
+                  <span class="buffet-tier-icon"><svg viewBox="0 0 24 24" width="1.5rem" height="1.5rem" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
                   <div class="buffet-tier-info">
                     <strong>Fancy</strong>
                     <span>20–50 guests</span>
@@ -37,7 +37,7 @@
                   </div>
                 </div>
                 <div class="buffet-tier" onclick="selectBuffetTier(this, 'magnificent')">
-                  <span class="buffet-tier-icon">👑</span>
+                  <span class="buffet-tier-icon"><svg viewBox="0 0 24 24" width="1.5rem" height="1.5rem" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
                   <div class="buffet-tier-info">
                     <strong>Magnificent</strong>
                     <span>50+ guests</span>
@@ -51,7 +51,7 @@
         <% } else { %>
           <div class="service-card" id="service-<%= service.id %>">
             <div class="service-card-header">
-              <span class="service-type-badge">🎨 Custom Cake</span>
+              <span class="service-type-badge"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Custom Cake</span>
               <h2><%= service.name %></h2>
               <p class="service-header-desc"><%= service.description %></p>
             </div>
@@ -80,21 +80,21 @@
           <label class="tier-option" onclick="document.getElementById('form-buffet-tier').value='intimate'">
             <input type="radio" name="buffet_tier_radio" value="intimate" onchange="document.getElementById('form-buffet-tier').value=this.value">
             <span class="tier-option-content">
-              <strong>🤝 Intimate</strong>
+              <strong><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:0.2rem"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Intimate</strong>
               <small>10–20 guests</small>
             </span>
           </label>
           <label class="tier-option" onclick="document.getElementById('form-buffet-tier').value='fancy'">
             <input type="radio" name="buffet_tier_radio" value="fancy" onchange="document.getElementById('form-buffet-tier').value=this.value">
             <span class="tier-option-content">
-              <strong>✨ Fancy</strong>
+              <strong><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:0.2rem"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Fancy</strong>
               <small>20–50 guests</small>
             </span>
           </label>
           <label class="tier-option" onclick="document.getElementById('form-buffet-tier').value='magnificent'">
             <input type="radio" name="buffet_tier_radio" value="magnificent" onchange="document.getElementById('form-buffet-tier').value=this.value">
             <span class="tier-option-content">
-              <strong>👑 Magnificent</strong>
+              <strong><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:0.2rem"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Magnificent</strong>
               <small>50+ guests</small>
             </span>
           </label>

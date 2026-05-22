@@ -29,7 +29,7 @@
     <div class="categories-grid staggered">
       <% categories.forEach((cat, i) => { %>
         <a href="/menu?category=<%= cat.slug %>" class="category-card" style="animation-delay: <%= 0.1 + i * 0.08 %>s">
-          <div class="category-icon"><%= cat.name === 'Cakes' ? '🎂' : cat.name === 'Pastries' ? '🥐' : cat.name === 'Cookies' ? '🍪' : cat.name === 'Bread' ? '🍞' : '✨' %></div>
+          <div class="category-icon"><%= cat.name === 'Cakes' ? '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>' : cat.name === 'Pastries' ? '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>' : cat.name === 'Cookies' ? '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="8" cy="9" r="1.5" fill="currentColor"/><circle cx="14" cy="7" r="1.5" fill="currentColor"/><circle cx="16" cy="14" r="1.5" fill="currentColor"/></svg>' : cat.name === 'Bread' ? '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11c0-4.5 4-7 8-7s8 2.5 8 7c0 2-1 4-2 5-1 2-2 3-2 5H6c0-2-1-3-2-5-1-1-2-3-2-5z"/></svg>' : '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>' %></div>
           <h3><%= cat.name %></h3>
           <p><%= cat.description %></p>
           <span class="category-link">Browse &rarr;</span>
@@ -49,7 +49,7 @@
     <div class="services-preview">
       <% services.forEach((svc, i) => { %>
         <div class="service-preview-card" style="animation-delay: <%= 0.1 + i * 0.12 %>s">
-          <div class="service-preview-icon"><%= svc.type === 'buffet' ? '🍰' : '🎨' %></div>
+          <div class="service-preview-icon"><%= svc.type === 'buffet' ? '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>' : '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>' %></div>
           <h3><%= svc.name %></h3>
           <p><%= svc.description %></p>
           <div class="service-preview-footer">
@@ -231,6 +231,13 @@
   font-size: 2.5rem;
   margin-bottom: 0.75rem;
   display: block;
+  line-height: 1;
+}
+.category-icon svg {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: block;
+  margin: 0 auto;
 }
 .category-link {
   display: inline-block;
@@ -266,6 +273,11 @@
 .service-preview-icon {
   font-size: 2.5rem;
   margin-bottom: 1rem;
+  line-height: 1;
+}
+.service-preview-icon svg {
+  width: 2.5rem;
+  height: 2.5rem;
 }
 .service-preview-card h3 {
   font-size: 1.3rem;
