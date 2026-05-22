@@ -141,8 +141,13 @@ module.exports = function(upload, fileUploadSecurity) {
 
   router.get('/api/pending-orders', async (req, res) => {
     const since = req.query.since || new Date(0).toISOString();
+    const scope = req.query.scope || 'active';
+    let statusFilter = '';
+    if (scope === 'active') {
+      statusFilter = "AND o.status IN ('pending', 'preparing', 'ready')";
+    }
     const orders = await db.query(
-      "SELECT o.*, c.name as customer_name, c.email as customer_email FROM orders o JOIN customers c ON o.customer_id = c.id WHERE o.created_at > ? AND o.order_type IN ('delivery', 'pickup') ORDER BY o.created_at ASC",
+      "SELECT o.*, c.name as customer_name, c.email as customer_email FROM orders o JOIN customers c ON o.customer_id = c.id WHERE o.created_at > ? AND o.order_type IN ('delivery', 'pickup') " + statusFilter + " ORDER BY o.created_at ASC",
       [since]
     );
     orders.forEach(o => { if (o.customer_name) o.customer_name = decrypt(o.customer_name); });
