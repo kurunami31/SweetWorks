@@ -17,6 +17,18 @@
   </style>
 </head>
 <body>
+<%
+function to12h(t) {
+  if (!t) return '';
+  const parts = t.trim().split(':');
+  if (parts.length < 2) return t.trim();
+  let h = parseInt(parts[0]), m = parts[1];
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  if (h === 0) h = 12;
+  else if (h > 12) h = h - 12;
+  return h + ':' + m + ' ' + ampm;
+}
+%>
   <div class="receipt">
     <div class="receipt-header">
       <h1>SweetWorks</h1>
@@ -36,9 +48,9 @@
       <% if (order.order_type === 'delivery') { %>
         <% if (order.customer_address) { %><p>📍 <%= order.customer_address %></p><% } %>
         <% if (deliveryDate) { %><p>📅 <%= deliveryDate[1].trim() %></p><% } %>
-        <% if (deliveryTime) { %><p>🕐 <%= deliveryTime[1].trim() %></p><% } %>
+        <% if (deliveryTime) { %><p>🕐 <%= to12h(deliveryTime[1]) %></p><% } %>
       <% } else { %>
-        <% if (pickupTime) { %><p>🕐 Pickup: <%= pickupTime[1].trim() %></p><% } %>
+        <% if (pickupTime) { %><p>🕐 Pickup: <%= to12h(pickupTime[1]) %></p><% } %>
       <% } %>
     </div>
     <% } %>
