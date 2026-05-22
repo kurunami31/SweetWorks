@@ -28,4 +28,10 @@
     </table>
   </div>
 </section>
+<script>
+  const hasPending = <%= orders.some(o => o.status === 'pending') %>;
+  if (hasPending) {
+    setTimeout(() => location.reload(), 10000);
+  }
+</script>
 <%- include('../partials/admin-footer') %>
