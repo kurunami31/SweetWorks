@@ -785,6 +785,7 @@ a:hover { color: var(--primary-dark); }
 
 /* Responsive - Phone */
 @media (max-width: 768px) {
+  body { overflow-x: hidden; }
   .container { padding: 0 1rem; }
 
   .nav-toggle { display: flex; flex-direction: column; align-items: center; justify-content: center; }
@@ -834,6 +835,7 @@ a:hover { color: var(--primary-dark); }
   .service-preview-card { padding: 1.5rem; }
 
   .order-layout { grid-template-columns: 1fr; }
+  .order-layout, .order-products, .order-cart { max-width: 100%; }
   .order-cart { position: static; padding: 1rem; }
   .order-layout .order-products .product-grid { grid-template-columns: repeat(2, 1fr); }
   .order-type-select { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
@@ -845,6 +847,7 @@ a:hover { color: var(--primary-dark); }
   .order-cart .form-group label { font-size: 0.8rem; }
   .order-cart input, .order-cart textarea, .order-cart select { padding: 0.45rem 0.6rem; font-size: 0.85rem; }
   .order-products .product-card .btn { font-size: 0.7rem; padding: 0.3rem 0.5rem; }
+  .product-card h3 { word-break: break-word; }
 
   .form-row { grid-template-columns: 1fr; }
   .order-detail-layout { grid-template-columns: 1fr; }
@@ -899,6 +902,7 @@ a:hover { color: var(--primary-dark); }
 
 /* Responsive - Small Phone */
 @media (max-width: 480px) {
+  body { overflow-x: hidden; }
   .container { padding: 0 0.75rem; }
   .product-grid { grid-template-columns: repeat(2, 1fr); gap: 0.4rem; }
   .product-card-body { padding: 0.6rem; }
