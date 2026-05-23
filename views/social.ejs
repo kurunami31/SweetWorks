@@ -20,12 +20,14 @@
           <p style="font-size:0.85rem;color:var(--text-light)"><%= fbError %></p>
         <% } %>
       </div>
-    <% } else if (posts.length === 0) { %>
-      <div style="text-align:center;padding:3rem 1rem;background:var(--white);border-radius:12px;border:1px solid var(--border)">
-        <p style="color:var(--text-light)">No posts available yet. Check back soon!</p>
-      </div>
-    <% } else { %>
-      <div class="fb-grid">
+    <% } else if (fbPage) { %>
+      <% if (posts.length === 0) { %>
+        <div style="text-align:center;padding:3rem 1rem;background:var(--white);border-radius:12px;border:1px solid var(--border)">
+          <p style="color:var(--text-light);font-size:1rem">No public posts found for <strong><%= fbPage.name %></strong>.</p>
+          <p style="color:var(--text-light);font-size:0.85rem;margin-top:0.5rem">Posts will appear here once published. Make sure they're set to <strong>Public</strong>.</p>
+        </div>
+      <% } else { %>
+        <div class="fb-grid">
         <% posts.forEach(post => { %>
           <a href="<%= post.url %>" target="_blank" rel="noopener" class="fb-card">
             <% if (post.type === 'video') { %>
