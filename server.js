@@ -87,6 +87,12 @@ app.use('/', authRouter);
 app.use('/admin', isAuthenticated, require('./routes/admin'));
 app.use('/pos', isAuthenticated, require('./routes/pos'));
 
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error('UNHANDLED ERROR:', err);
+  res.status(500).send('Internal Server Error');
+});
+
 app.use((req, res) => {
   res.status(404).render('error', { message: 'Page not found' });
 });

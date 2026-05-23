@@ -5,21 +5,23 @@ const CACHE_TTL = 10 * 60 * 1000;
 
 function graphRequest(path) {
   return new Promise((resolve, reject) => {
-    const token = process.env.FACEBOOK_PAGE_TOKEN;
-    if (!token) return reject(new Error('FACEBOOK_PAGE_TOKEN not set'));
-    const tokenEncoded = encodeURIComponent(token);
-    const url = `https://graph.facebook.com/v22.0/${path.includes('?') ? path + '&' : path + '?'}access_token=${tokenEncoded}`;
-    https.get(url, (res) => {
-      let data = '';
-      res.on('data', chunk => data += chunk);
-      res.on('end', () => {
-        try {
-          const json = JSON.parse(data);
-          if (json.error) reject(new Error(json.error.message));
-          else resolve(json);
-        } catch (e) { reject(new Error('Parse error: ' + e.message + ' | Raw: ' + data.slice(0, 200))); }
-      });
-    }).on('error', reject);
+    try {
+      const token = process.env.FACEBOOK_PAGE_TOKEN;
+      if (!token) return reject(new Error('FACEBOOK_PAGE_TOKEN not set'));
+      const qs = path.includes('?') ? '&' : '?';
+      const url = `https://graph.facebook.com/v21.0/${path}${qs}access_token=${encodeURIComponent(token)}`;
+      https.get(url, (res) => {
+        let data = '';
+        res.on('data', chunk => data += chunk);
+        res.on('end', () => {
+          try {
+            const json = JSON.parse(data);
+            if (json.error) reject(new Error(json.error.message));
+            else resolve(json);
+          } catch (e) { reject(e); }
+        });
+      }).on('error', reject);
+    } catch (e) { reject(e); }
   });
 }
 
@@ -40,11 +42,7 @@ function formatPost(post) {
 async function fetchPosts() {
   const now = Date.now();
   if (cache.posts.length && (now - cache.lastFetch) < CACHE_TTL) return cache.posts;
-
-  if (!cache.pageInfo) {
-    cache.pageInfo = await graphRequest('me?fields=id,name');
-  }
-
+  if (!cache.pageInfo) cache.pageInfo = await graphRequest('me?fields=id,name');
   const raw = await graphRequest(`${cache.pageInfo.id}/posts?fields=message,created_time,full_picture&limit=50`);
   cache.posts = (raw.data || []).map(formatPost);
   cache.lastFetch = now;
