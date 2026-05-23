@@ -1,6 +1,7 @@
 const express = require('express');
 const db = require('../database');
 const { encrypt, decrypt, decryptCustomerFields } = require('../security');
+const fb = require('../facebook');
 
 module.exports = function(upload, fileUploadSecurity) {
   const router = express.Router();
@@ -15,8 +16,15 @@ router.get('/home', async (req, res) => {
   res.render('index', { categories, services });
 });
 
-router.get('/social', (req, res) => {
-  res.render('social');
+router.get('/social', async (req, res) => {
+  let posts = [];
+  let fbError = null;
+  try {
+    posts = await fb.fetchPosts();
+  } catch (e) {
+    fbError = process.env.FACEBOOK_PAGE_TOKEN ? e.message : 'FACEBOOK_PAGE_TOKEN not configured';
+  }
+  res.render('social', { posts, fbError });
 });
 
   router.get('/signature-treats', async (req, res) => {

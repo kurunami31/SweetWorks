@@ -6,30 +6,177 @@
       <h1 class="section-title">Follow Us on Facebook</h1>
       <p class="section-desc">Stay updated with our latest creations, promotions, and behind-the-scenes content</p>
     </div>
-    <div class="social-feed">
-      <div id="fb-root"></div>
-      <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v22.0"></script>
-      <div class="fb-page" data-href="https://www.facebook.com/Sweetworks" data-tabs="timeline" data-width="" data-height="1000" data-small-header="false" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true">
-        <blockquote cite="https://www.facebook.com/Sweetworks" class="fb-xfbml-parse-ignore">
-          <a href="https://www.facebook.com/Sweetworks">SweetWorks</a>
-        </blockquote>
-      </div>
-    </div>
   </div>
 </section>
+<div class="social-feed-wrap">
+  <div class="container">
+    <% if (fbError) { %>
+      <div style="text-align:center;padding:3rem 1rem;background:var(--white);border-radius:12px;border:1px solid var(--border)">
+        <% if (!process.env.FACEBOOK_PAGE_TOKEN) { %>
+          <p style="font-size:1.1rem;color:var(--text-light);margin-bottom:1rem">Facebook feed not yet configured.</p>
+          <p style="font-size:0.9rem;color:var(--text-light)">Set up your <code>FACEBOOK_PAGE_TOKEN</code> environment variable to display the feed.</p>
+        <% } else { %>
+          <p style="color:var(--danger)">Unable to load Facebook feed at this time.</p>
+        <% } %>
+      </div>
+    <% } else if (posts.length === 0) { %>
+      <div style="text-align:center;padding:3rem 1rem;background:var(--white);border-radius:12px;border:1px solid var(--border)">
+        <p style="color:var(--text-light)">No posts available yet. Check back soon!</p>
+      </div>
+    <% } else { %>
+      <div class="fb-grid">
+        <% posts.forEach(post => { %>
+          <a href="<%= post.url %>" target="_blank" rel="noopener" class="fb-card">
+            <% if (post.type === 'video') { %>
+              <div class="fb-card-media fb-video">
+                <% if (post.thumbnail) { %>
+                  <img src="<%= post.thumbnail %>" alt="" loading="lazy">
+                  <span class="fb-play-btn"><svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><polygon points="8,5 19,12 8,19"/></svg></span>
+                <% } %>
+              </div>
+            <% } else if (post.type === 'album' || post.type === 'photo') { %>
+              <div class="fb-card-media">
+                <% if (post.images && post.images[0]) { %>
+                  <img src="<%= post.images[0] %>" alt="" loading="lazy">
+                  <% if (post.images.length > 1) { %>
+                    <span class="fb-album-badge">+<%= post.images.length - 1 %></span>
+                  <% } %>
+                <% } %>
+              </div>
+            <% } else if (post.type === 'link') { %>
+              <div class="fb-card-media">
+                <% if (post.thumbnail) { %>
+                  <img src="<%= post.thumbnail %>" alt="" loading="lazy">
+                  <span class="fb-link-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span>
+                <% } %>
+              </div>
+            <% } else { %>
+              <div class="fb-card-text-only">
+                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+              </div>
+            <% } %>
+            <div class="fb-card-body">
+              <% if (post.message) { %>
+                <p class="fb-card-text"><%= post.message.length > 150 ? post.message.slice(0, 150) + '…' : post.message %></p>
+              <% } %>
+              <span class="fb-card-date"><%= new Date(post.created_time).toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'Asia/Manila' }) %></span>
+            </div>
+          </a>
+        <% }) %>
+      </div>
+      <div style="text-align:center;margin-top:2rem">
+        <a href="https://www.facebook.com/Sweetworks" target="_blank" rel="noopener" class="btn btn-primary btn-lg" style="display:inline-flex;align-items:center;gap:0.6rem">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          View on Facebook
+        </a>
+      </div>
+    <% } %>
+  </div>
+</div>
 <style>
-  .social-feed {
+  .social-feed-wrap {
+    background: var(--bg-alt);
+    padding: 0 0 3rem;
+  }
+  .fb-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.25rem;
+  }
+  .fb-card {
+    background: var(--white);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-decoration: none;
+    color: inherit;
     display: flex;
-    justify-content: center;
-    margin-top: 1rem;
-    min-height: 800px;
+    flex-direction: column;
   }
-  .social-feed .fb-page {
+  .fb-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(61,90,69,0.12);
+  }
+  .fb-card-media {
+    position: relative;
     width: 100%;
+    aspect-ratio: 16/10;
+    overflow: hidden;
+    background: var(--bg-alt);
   }
-  .social-feed iframe {
-    width: 100% !important;
-    min-height: 800px !important;
+  .fb-card-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .fb-video { position: relative; }
+  .fb-play-btn {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.25);
+    color: white;
+    font-size: 3rem;
+    transition: background 0.2s;
+  }
+  .fb-card:hover .fb-play-btn { background: rgba(0,0,0,0.35); }
+  .fb-album-badge {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: rgba(0,0,0,0.65);
+    color: white;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+  }
+  .fb-link-icon {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.15);
+    color: white;
+  }
+  .fb-card-text-only {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: var(--accent-light);
+    color: var(--primary);
+  }
+  .fb-card-body {
+    padding: 0.85rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .fb-card-text {
+    font-size: 0.85rem;
+    color: var(--text);
+    line-height: 1.5;
+    margin: 0 0 0.5rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .fb-card-date {
+    font-size: 0.75rem;
+    color: var(--text-light);
+    margin-top: auto;
+  }
+  @media (max-width: 768px) {
+    .fb-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+  }
+  @media (max-width: 480px) {
+    .fb-grid { grid-template-columns: 1fr; }
   }
 </style>
 <%- include('partials/footer') %>
