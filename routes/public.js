@@ -19,12 +19,15 @@ router.get('/home', async (req, res) => {
 router.get('/social', async (req, res) => {
   let posts = [];
   let fbError = null;
-  try {
-    posts = await fb.fetchPosts();
-  } catch (e) {
-    fbError = process.env.FACEBOOK_PAGE_TOKEN ? e.message : 'FACEBOOK_PAGE_TOKEN not configured';
+  const tokenSet = !!process.env.FACEBOOK_PAGE_TOKEN;
+  if (tokenSet) {
+    try {
+      posts = await fb.fetchPosts();
+    } catch (e) {
+      fbError = e.message;
+    }
   }
-  res.render('social', { posts, fbError });
+  res.render('social', { posts, fbError, tokenSet });
 });
 
   router.get('/signature-treats', async (req, res) => {

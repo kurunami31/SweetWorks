@@ -12,11 +12,12 @@
   <div class="container">
     <% if (fbError) { %>
       <div style="text-align:center;padding:3rem 1rem;background:var(--white);border-radius:12px;border:1px solid var(--border)">
-        <% if (!process.env.FACEBOOK_PAGE_TOKEN) { %>
+        <% if (!tokenSet) { %>
           <p style="font-size:1.1rem;color:var(--text-light);margin-bottom:1rem">Facebook feed not yet configured.</p>
           <p style="font-size:0.9rem;color:var(--text-light)">Set up your <code>FACEBOOK_PAGE_TOKEN</code> environment variable to display the feed.</p>
         <% } else { %>
-          <p style="color:var(--danger)">Unable to load Facebook feed at this time.</p>
+          <p style="color:var(--danger);margin-bottom:0.5rem">Unable to load Facebook feed.</p>
+          <p style="font-size:0.85rem;color:var(--text-light)"><%= fbError %></p>
         <% } %>
       </div>
     <% } else if (posts.length === 0) { %>
