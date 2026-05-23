@@ -18,6 +18,14 @@
         <% } else { %>
           <p style="color:var(--danger);margin-bottom:0.5rem">Unable to load Facebook feed.</p>
           <p style="font-size:0.85rem;color:var(--text-light)"><%= fbError %></p>
+          <p style="font-size:0.85rem;color:var(--text-light);margin-top:1rem">How to fix:</p>
+          <ol style="text-align:left;display:inline-block;font-size:0.85rem;color:var(--text-light);margin-top:0.4rem">
+            <li>Go to <a href="https://developers.facebook.com/tools/explorer" target="_blank" style="color:var(--primary)">Graph API Explorer</a></li>
+            <li>Select your app (top-right), then <strong>Get Page Access Token</strong></li>
+            <li>Select your page from the dropdown</li>
+            <li>Click <strong>Generate Access Token</strong> and grant <code>pages_read_engagement</code></li>
+            <li>Copy the long token string and set it as <code>FACEBOOK_PAGE_TOKEN</code> env var</li>
+          </ol>
         <% } %>
       </div>
     <% } else if (!tokenSet) { %>
