@@ -20,15 +20,17 @@ router.get('/social', async (req, res, next) => {
   try {
     let posts = [];
     let fbError = null;
+    let fbPage = null;
     const tokenSet = !!process.env.FACEBOOK_PAGE_TOKEN;
     if (tokenSet) {
       try {
         posts = await fb.fetchPosts();
+        fbPage = fb.getPageInfo();
       } catch (e) {
         fbError = e.message;
       }
     }
-    res.render('social', { posts, fbError, tokenSet });
+    res.render('social', { posts, fbError, fbPage, tokenSet });
   } catch (e) { next(e); }
 });
 

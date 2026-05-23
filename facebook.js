@@ -1,6 +1,6 @@
 const https = require('https');
 
-let cache = { posts: [], lastFetch: 0 };
+let cache = { posts: [], pageInfo: null, lastFetch: 0 };
 const CACHE_TTL = 10 * 60 * 1000;
 
 function graphRequest(urlPath) {
@@ -22,11 +22,25 @@ function graphRequest(urlPath) {
   });
 }
 
+async function verifyToken() {
+  const info = await graphRequest('me?fields=id,name');
+  return { id: info.id, name: info.name };
+}
+
 async function fetchPosts() {
   const now = Date.now();
   if (cache.posts.length && (now - cache.lastFetch) < CACHE_TTL) return cache.posts;
 
-  const raw = await graphRequest('Sweetworks/posts?fields=message,created_time,full_picture&limit=50');
+  let pageId;
+  if (cache.pageInfo) {
+    pageId = cache.pageInfo.id;
+  } else {
+    const info = await verifyToken();
+    cache.pageInfo = { id: info.id, name: info.name };
+    pageId = info.id;
+  }
+
+  const raw = await graphRequest(`${pageId}/posts?fields=message,created_time,full_picture&limit=50`);
   cache.posts = (raw.data || []).map(p => {
     const parts = (p.id || '').split('_');
     return {
@@ -42,6 +56,10 @@ async function fetchPosts() {
   return cache.posts;
 }
 
-function clearCache() { cache = { posts: [], lastFetch: 0 }; }
+function getPageInfo() {
+  return cache.pageInfo || null;
+}
 
-module.exports = { fetchPosts, clearCache };
+function clearCache() { cache = { posts: [], pageInfo: null, lastFetch: 0 }; }
+
+module.exports = { fetchPosts, getPageInfo, clearCache };
